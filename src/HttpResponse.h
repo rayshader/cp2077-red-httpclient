@@ -18,6 +18,7 @@ class HttpResponse : public Red::IScriptable {
 
  public:
   HttpResponse() = default;
+
   explicit HttpResponse(int32_t p_status_code,
                         Red::DynArray<HttpHeader> p_headers,
                         Red::CString p_body)
@@ -25,9 +26,7 @@ class HttpResponse : public Red::IScriptable {
         headers(std::move(p_headers)),
         body(std::move(p_body)) {}
 
-  [[nodiscard]] int32_t get_status_code() const {
-    return status_code;
-  }
+  [[nodiscard]] int32_t get_status_code() const { return status_code; }
 
   [[nodiscard]] Red::DynArray<HttpHeader> get_headers() const {
     return headers;
@@ -51,9 +50,7 @@ class HttpResponse : public Red::IScriptable {
     return {};
   }
 
-  [[nodiscard]] Red::CString get_text() const {
-    return body;
-  }
+  [[nodiscard]] Red::CString get_text() const { return body; }
 
   RTTI_IMPL_TYPEINFO(RedHttpClient::HttpResponse);
   RTTI_IMPL_ALLOCATOR();
