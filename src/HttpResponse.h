@@ -33,6 +33,24 @@ class HttpResponse : public Red::IScriptable {
     return headers;
   }
 
+  [[nodiscard]] bool has_header(const Red::CString& p_header) const {
+    for (const auto& header : headers) {
+      if (header.name == p_header) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  [[nodiscard]] Red::CString get_header(const Red::CString& p_header) const {
+    for (const auto& header : headers) {
+      if (header.name == p_header) {
+        return header.value;
+      }
+    }
+    return {};
+  }
+
   [[nodiscard]] Red::CString get_text() const {
     return body;
   }
@@ -48,6 +66,8 @@ RTTI_DEFINE_CLASS(RedHttpClient::HttpResponse, {
 
   RTTI_METHOD(get_status_code, "GetStatusCode");
   RTTI_METHOD(get_headers, "GetHeaders");
+  RTTI_METHOD(has_header, "HasHeader");
+  RTTI_METHOD(get_header, "GetHeader");
   RTTI_METHOD(get_text, "GetText");
 });
 

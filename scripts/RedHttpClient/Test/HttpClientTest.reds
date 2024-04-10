@@ -5,6 +5,23 @@ public class HttpClientTest extends BaseTest {
     this.m_name = "HttpClient";
   }
 
+  /// HttpResponse ///
+
+  private cb func Test_HasHeader() {
+    let response = HttpClient.Get("https://postman-echo.com/get");
+
+    this.ExpectBool("GET -> Header 'Content-Type' is present", response.HasHeader("Content-Type"), true);
+    this.ExpectBool("GET -> Header 'X-Unknown' is not present", response.HasHeader("X-Unknown"), false);
+  }
+
+  private cb func Test_GetHeader() {
+    let response = HttpClient.Get("https://postman-echo.com/get");
+    let contentType = "application/json; charset=utf-8";
+
+    this.ExpectString(s"GET -> Header 'Content-Type' == '\(contentType)'", response.GetHeader("Content-Type"), contentType);
+    this.ExpectString("GET -> Header 'X-Unknown' == ''", response.GetHeader("X-Unknown"), "");
+  }
+
   /// GET ///
 
   private cb func Test_Get() {
