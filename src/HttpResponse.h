@@ -49,8 +49,6 @@ RTTI_DEFINE_CLASS(RedHttpClient::HttpResponse, {
   RTTI_METHOD(get_status_code, "GetStatusCode");
   RTTI_METHOD(get_headers, "GetHeaders");
   RTTI_METHOD(get_text, "GetText");
-  //RTTI_METHOD(get_json, "GetJson");
-  //RTTI_METHOD(get_xml, "GetXml");
 });
 
 #endif  //REDHTTPCLIENT_HTTPRESPONSE_H

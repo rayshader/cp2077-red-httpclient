@@ -19,7 +19,15 @@ public class HttpClientTest extends BaseTest {
     let response = HttpClient.Post("https://postman-echo.com/post", "Hello world!");
 
     this.ExpectInt32("POST -> 200 OK", response.GetStatusCode(), 200);
-    this.ExpectString("POST -> 'Hello world!'", response.GetText(), "Hello world!");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("POST -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let data = json.GetKeyString("data");
+
+    this.ExpectString("POST -> 'Hello world!'", data, "Hello world!");
   }
 
   private cb func Test_PostForm() {
@@ -30,7 +38,16 @@ public class HttpClientTest extends BaseTest {
     let response = HttpClient.PostForm("https://postman-echo.com/post", form);
 
     this.ExpectInt32("POST FORM -> 200 OK", response.GetStatusCode(), 200);
-    this.ExpectString("POST FORM -> {client: HttpClient, version: 0.1.0}", response.GetText(), "{client: HttpClient, version: 0.1.0}");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("POST FORM -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("POST FORM -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("POST FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
   }
 
 }
