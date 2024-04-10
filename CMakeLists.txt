@@ -11,6 +11,7 @@ set(INC_FILES
         src/HttpResponse.h
         src/HttpHeader.h
         src/HttpPair.h
+        src/HttpStatus.h
 )
 
 set(SRC_FILES

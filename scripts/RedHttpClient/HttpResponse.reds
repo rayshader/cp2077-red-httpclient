@@ -1,5 +1,6 @@
 public native class HttpResponse {
 
+  public native func GetStatus() -> HttpStatus;
   public native func GetStatusCode() -> Int32;
 
   public native func GetHeaders() -> array<HttpHeader>;

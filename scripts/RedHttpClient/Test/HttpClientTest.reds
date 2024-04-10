@@ -28,6 +28,14 @@ public class HttpClientTest extends BaseTest {
     let response = HttpClient.Get("https://postman-echo.com/get");
 
     this.ExpectInt32("GET -> 200 OK", response.GetStatusCode(), 200);
+    this.ExpectString("GET -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+  }
+
+  private cb func Test_Get_NotFound() {
+    let response = HttpClient.Get("https://postman-echo.com/get_404");
+
+    this.ExpectInt32("GET -> 404 Not Found", response.GetStatusCode(), 404);
+    this.ExpectString("GET -> HttpStatus.NotFound", s"\(response.GetStatus())", s"\(HttpStatus.NotFound)");
   }
 
   /// POST ///
@@ -35,7 +43,7 @@ public class HttpClientTest extends BaseTest {
   private cb func Test_Post() {
     let response = HttpClient.Post("https://postman-echo.com/post", "Hello world!");
 
-    this.ExpectInt32("POST -> 200 OK", response.GetStatusCode(), 200);
+    this.ExpectString("POST -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST -> application/json", IsDefined(json), true) {
@@ -54,7 +62,7 @@ public class HttpClientTest extends BaseTest {
     ];
     let response = HttpClient.PostForm("https://postman-echo.com/post", form);
 
-    this.ExpectInt32("POST FORM -> 200 OK", response.GetStatusCode(), 200);
+    this.ExpectString("POST FORM -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST FORM -> application/json", IsDefined(json), true) {
@@ -71,7 +79,7 @@ public class HttpClientTest extends BaseTest {
     let json = ParseJson("{\"client\": \"HttpClient\", \"version\": 42, \"items\": []}");
     let response = HttpClient.PostJson("https://postman-echo.com/post", json);
 
-    this.ExpectInt32("POST JSON -> 200 OK", response.GetStatusCode(), 200);
+    this.ExpectString("POST JSON -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST JSON -> application/json", IsDefined(json), true) {

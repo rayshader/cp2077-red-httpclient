@@ -7,6 +7,7 @@
 #include <RedLib.hpp>
 
 #include "HttpHeader.h"
+#include "HttpStatus.h"
 
 namespace RedHttpClient {
 
@@ -25,6 +26,10 @@ class HttpResponse : public Red::IScriptable {
       : status_code(p_status_code),
         headers(std::move(p_headers)),
         body(std::move(p_body)) {}
+
+  [[nodiscard]] HttpStatus get_status() const {
+    return static_cast<HttpStatus>(status_code);
+  }
 
   [[nodiscard]] int32_t get_status_code() const { return status_code; }
 
@@ -61,6 +66,7 @@ class HttpResponse : public Red::IScriptable {
 RTTI_DEFINE_CLASS(RedHttpClient::HttpResponse, {
   RTTI_ALIAS("RedHttpClient.HttpResponse");
 
+  RTTI_METHOD(get_status, "GetStatus");
   RTTI_METHOD(get_status_code, "GetStatusCode");
   RTTI_METHOD(get_headers, "GetHeaders");
   RTTI_METHOD(has_header, "HasHeader");
