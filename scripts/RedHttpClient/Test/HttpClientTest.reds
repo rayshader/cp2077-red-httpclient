@@ -50,4 +50,24 @@ public class HttpClientTest extends BaseTest {
     this.ExpectString("POST FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
   }
 
+  private cb func Test_PostJson() {
+    let json = ParseJson("{\"client\": \"HttpClient\", \"version\": 42, \"items\": []}");
+    let response = HttpClient.PostJson("https://postman-echo.com/post", json);
+
+    this.ExpectInt32("POST JSON -> 200 OK", response.GetStatusCode(), 200);
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("POST JSON -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    json = json.GetKey("json") as JsonObject;
+    this.ExpectString("POST JSON -> $.client == 'HttpClient'", json.GetKeyString("client"), "HttpClient");
+    this.ExpectInt64("POST JSON -> $.version == 42", json.GetKeyInt64("version"), 42l);
+    let items = json.GetKey("items") as JsonArray;
+
+    this.ExpectBool("POST JSON -> $.items === [...]", items.IsArray(), true);
+    this.ExpectUint32("POST JSON -> $.items.length == 0", items.GetSize(), 0u);
+  }
+
 }
