@@ -5,6 +5,7 @@
 #include <RED4ext/RED4ext.hpp>
 #include <RedLib.hpp>
 
+#include "HttpHeader.h"
 #include "HttpPair.h"
 #include "HttpResponse.h"
 
@@ -12,14 +13,18 @@ namespace RedHttpClient {
 
 class HttpClient : public Red::IScriptable {
  private:
-  static Red::DynArray<HttpHeader> get_headers(const cpr::Response& p_response);
+  static cpr::Header build_headers(const HttpHeaders& p_headers);
+  static HttpHeaders get_headers(const cpr::Response& p_response);
 
  public:
-  static Red::Handle<HttpResponse> get(const Red::CString& p_url);
-  static Red::Handle<HttpResponse> post(const Red::CString& p_url,
-                                        const Red::CString& p_body);
+  static Red::Handle<HttpResponse> get(
+    const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
+  static Red::Handle<HttpResponse> post(
+    const Red::CString& p_url, const Red::CString& p_body,
+    const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> post_form(
-    const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form);
+    const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+    const Red::Optional<HttpHeaders>& p_headers);
 
   RTTI_IMPL_TYPEINFO(RedHttpClient::HttpClient);
   RTTI_IMPL_ALLOCATOR();

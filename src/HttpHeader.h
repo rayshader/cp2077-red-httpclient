@@ -11,6 +11,8 @@ struct HttpHeader {
   Red::CString value;
 };
 
+using HttpHeaders = Red::DynArray<HttpHeader>;
+
 }  // namespace RedHttpClient
 
 RTTI_DEFINE_CLASS(RedHttpClient::HttpHeader, {
