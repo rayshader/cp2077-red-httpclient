@@ -7,9 +7,10 @@ public native class HttpClient {
 
   @if(ModuleExists("RedData"))
   public static func PostJson(url: String, body: ref<JsonVariant>) -> ref<HttpResponse> {
-    let headers: array<HttpHeader> = [];
+    let headers: array<HttpHeader> = [
+      HttpHeader.Create("Content-Type", "application/json; charset=utf-8")
+    ];
 
-    ArrayPush(headers, HttpHeader.Create("Content-Type", "application/json; charset=utf-8"));
     return HttpClient.Post(url, body.ToString(), headers);
   }
 
