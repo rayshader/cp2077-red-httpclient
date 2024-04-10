@@ -8,9 +8,9 @@ configure_file(src/Config.h.in Config/Config.h)
 
 set(INC_FILES
         src/HttpClient.h
-        src/HttpResponse.h
         src/HttpHeader.h
         src/HttpPair.h
+        src/HttpResponse.h
         src/HttpStatus.h
 )
 
