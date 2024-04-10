@@ -22,6 +22,24 @@ public class HttpClientTest extends BaseTest {
     this.ExpectString("GET -> Header 'X-Unknown' == ''", response.GetHeader("X-Unknown"), "");
   }
 
+  /// SSL ///
+
+  private cb func Test_WithoutSSL() {
+    let response = HttpClient.Get("http://postman-echo.com/get");
+
+    this.ExpectBool("GET without SSL -> no response", IsDefined(response), false);
+    response = HttpClient.Post("http://postman-echo.com/post", "Not safe");
+
+    this.ExpectBool("POST without SSL -> no response", IsDefined(response), false);
+    let form = [
+      HttpPair.Create("ssl", "false"),
+      HttpPair.Create("response", "null")
+    ];
+    response = HttpClient.PostForm("http://postman-echo.com/post", form);
+
+    this.ExpectBool("POST FORM without SSL -> no response", IsDefined(response), false);
+  }
+
   /// GET ///
 
   private cb func Test_Get() {

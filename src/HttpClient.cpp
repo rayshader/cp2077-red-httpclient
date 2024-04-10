@@ -6,6 +6,14 @@
 
 namespace RedHttpClient {
 
+const cpr::SslOptions HttpClient::ssl_options = cpr::Ssl(cpr::ssl::TLSv1_2{});
+
+bool HttpClient::is_secure(const Red::CString& p_url) {
+  std::string url(p_url.c_str());
+
+  return url.starts_with("https://");
+}
+
 cpr::Header HttpClient::build_headers(
   const RedHttpClient::HttpHeaders& p_headers) {
   cpr::Header headers;
@@ -31,8 +39,12 @@ HttpHeaders HttpClient::get_headers(const cpr::Response& p_response) {
 
 Red::Handle<HttpResponse> HttpClient::get(
   const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
   cpr::Header request_headers = build_headers(p_headers.value);
-  cpr::Response response = cpr::Get(cpr::Url{p_url.c_str()}, request_headers);
+  cpr::Response response =
+    cpr::Get(ssl_options, cpr::Url{p_url.c_str()}, request_headers);
   HttpHeaders headers = get_headers(response);
 
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
@@ -42,13 +54,17 @@ Red::Handle<HttpResponse> HttpClient::get(
 Red::Handle<HttpResponse> HttpClient::post(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
   cpr::Header request_headers = build_headers(p_headers.value);
 
   if (!request_headers.contains("Content-Type")) {
     request_headers["Content-Type"] = "text/plain";
   }
-  cpr::Response response = cpr::Post(
-    cpr::Url{p_url.c_str()}, cpr::Body{p_body.c_str()}, request_headers);
+  cpr::Response response =
+    cpr::Post(ssl_options, cpr::Url{p_url.c_str()}, cpr::Body{p_body.c_str()},
+              request_headers);
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
@@ -58,6 +74,9 @@ Red::Handle<HttpResponse> HttpClient::post(
 Red::Handle<HttpResponse> HttpClient::post_form(
   const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
   std::vector<cpr::Pair> values;
 
   for (const auto& pair : p_form) {
@@ -65,7 +84,7 @@ Red::Handle<HttpResponse> HttpClient::post_form(
   }
   cpr::Header request_headers = build_headers(p_headers.value);
   cpr::Response response =
-    cpr::Post(cpr::Url{p_url.c_str()},
+    cpr::Post(ssl_options, cpr::Url{p_url.c_str()},
               cpr::Payload{values.begin(), values.end()}, request_headers);
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
