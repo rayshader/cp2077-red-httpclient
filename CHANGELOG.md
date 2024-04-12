@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- 
+- HttpClient to send HTTP requests (blocking mode).
+- AsyncHttpClient to asynchronously send HTTP requests (callback mode).
 
 <!-- Table of releases -->
 [Unreleased]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.1.0...HEAD
