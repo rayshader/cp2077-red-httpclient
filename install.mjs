@@ -52,20 +52,9 @@ console.info(`[RedHttpClient] Test script directory created at: ${GAME_TEST_SCRI
 
 
 const BUILD_LIBRARY_PATH = `build\\Debug\\RedHttpClient.dll`;
-const BUILD_DEPS_LIBRARY_PATH = [
-    'build\\_deps\\cpr-build\\cpr\\Debug\\cpr.dll',
-    'build\\_deps\\curl-build\\lib\\Debug\\libcurl-d.dll',
-];
 const GAME_LIBRARY_PATH = `${GAME_PLUGIN_PATH}\\RedHttpClient.dll`;
-const GAME_DEPS_LIBRARY_PATH = [
-    `${GAME_PLUGIN_PATH}\\cpr.dll`,
-    `${GAME_PLUGIN_PATH}\\libcurl-d.dll`,
-];
 
 fs.cpSync(BUILD_LIBRARY_PATH, GAME_LIBRARY_PATH, {force: true});
-for (let i = 0; i < BUILD_DEPS_LIBRARY_PATH.length; i++) {
-    fs.cpSync(BUILD_DEPS_LIBRARY_PATH[i], GAME_DEPS_LIBRARY_PATH[i], {force: true});
-}
 
 console.info(`[RedHttpClient] Library installed.`);
 
