@@ -219,8 +219,11 @@ Contributions are welcome, feel free to fill an issue or a PR.
     - run `npm install --save-dev archiver`
 2. Configure project with:
 ```shell
-cmake -G "Visual Studio 17 2022" -A x64 -S . -B build
+cmake -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIBS:BOOL=OFF -S . -B build
 ```
+
+`BUILD_SHARED_LIBS` is required to avoid conflicts with another version of 
+`libcurl` from the game.
 
 3. Build in debug mode:
 ```shell
