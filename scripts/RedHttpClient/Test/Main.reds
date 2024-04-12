@@ -8,7 +8,8 @@ public class MainTest extends ScriptableEnv {
   private cb func OnLoad() {
     this.m_runner = new RedTest();
     this.m_runner.Setup("RedHttpClient", [
-      new HttpClientTest() as BaseTest
+      new HttpClientTest(),
+      new AsyncHttpClientTest()
     ]);
   }
 

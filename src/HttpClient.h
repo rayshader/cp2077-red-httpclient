@@ -12,10 +12,10 @@
 namespace RedHttpClient {
 
 class HttpClient : public Red::IScriptable {
- private:
+ public:
   static const cpr::SslOptions ssl_options;
 
-  static inline bool is_secure(const Red::CString& p_url);
+  static bool is_secure(const Red::CString& p_url);
   static cpr::Header build_headers(const HttpHeaders& p_headers);
   static HttpHeaders get_headers(const cpr::Response& p_response);
 

@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 configure_file(src/Config.h.in Config/Config.h)
 
 set(INC_FILES
+        src/AsyncHttpClient.h
+        src/HttpCallback.h
         src/HttpClient.h
         src/HttpHeader.h
         src/HttpPair.h
@@ -17,6 +19,7 @@ set(INC_FILES
 set(SRC_FILES
         src/main.cpp
 
+        src/AsyncHttpClient.cpp
         src/HttpClient.cpp
 )
 
