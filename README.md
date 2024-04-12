@@ -21,6 +21,8 @@ CET.
 
 ## Usage
 
+You can find examples for both Redscript and Lua (CET) in [examples/].
+
 ### HttpResponse
 
 After sending an HTTP request, you should receive a `HttpResponse` whether 
