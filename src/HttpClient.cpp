@@ -178,13 +178,7 @@ Red::Handle<HttpResponse> HttpClient::delete_(
   if (!is_secure(p_url)) {
     return {};
   }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  cpr::Response response =
-    cpr::Delete(ssl_options, cpr::Url{p_url.c_str()}, request_headers);
+  cpr::Response response = cpr::Delete(ssl_options, cpr::Url{p_url.c_str()});
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
