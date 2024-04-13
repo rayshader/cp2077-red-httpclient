@@ -29,12 +29,14 @@ function Example_OnCatFacts(response)
   if response:GetStatusCode() ~= 200 then
     print("Request failed, status code: " .. tostring(response:GetStatusCode()))
     Shutdown()
+    return
   end
   local contentType = response:GetHeader("Content-Type")
 
   if contentType ~= "application/json; charset=utf-8" then
     print("Request failed, Json expected instead of '" .. contentType .. "'.")
     Shutdown()
+    return
   end
   local data = response:GetText()
   local facts = json.decode(data)
