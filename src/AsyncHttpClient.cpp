@@ -161,8 +161,9 @@ void AsyncHttpClient::delete_(const HttpCallback& p_callback,
     p_callback({});
     return;
   }
-  cpr::AsyncResponse response =
-    cpr::DeleteAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()});
+  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  cpr::AsyncResponse response = cpr::DeleteAsync(
+    HttpClient::ssl_options, cpr::Url{p_url.c_str()}, request_headers);
 
   queue_request(response.share(), p_callback);
 }

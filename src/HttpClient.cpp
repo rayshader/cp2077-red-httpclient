@@ -178,7 +178,9 @@ Red::Handle<HttpResponse> HttpClient::delete_(
   if (!is_secure(p_url)) {
     return {};
   }
-  cpr::Response response = cpr::Delete(ssl_options, cpr::Url{p_url.c_str()});
+  cpr::Header request_headers = build_headers(p_headers.value);
+  cpr::Response response =
+    cpr::Delete(ssl_options, cpr::Url{p_url.c_str()}, request_headers);
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
