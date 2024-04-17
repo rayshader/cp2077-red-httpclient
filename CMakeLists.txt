@@ -60,8 +60,20 @@ FetchContent_Declare(cpr
 FetchContent_MakeAvailable(cpr)
 ##
 
+## Library RedData
+add_subdirectory(deps/RedData)
+set_target_properties(RedData PROPERTIES FOLDER "Dependencies")
+##
+
+## Library RedFileSystem
+add_subdirectory(deps/RedFileSystem)
+set_target_properties(RedFileSystem PROPERTIES FOLDER "Dependencies")
+##
+
 target_link_libraries(RedHttpClient PRIVATE
         RED4ext::SDK
         RedLib
+        RedData
+        RedFileSystem
         cpr::cpr
 )
