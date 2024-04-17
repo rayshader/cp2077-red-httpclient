@@ -3,7 +3,7 @@ import RedHttpClient.*
 
 public class AsyncHttpClientTest extends BaseTest {
 
-  public func Init() {
+  public func Create() {
     this.m_modName = "RedHttpClient";
     this.m_name = "AsyncHttpClient";
     this.m_isAsync = true;
