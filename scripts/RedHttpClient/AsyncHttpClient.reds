@@ -5,7 +5,7 @@ public native class AsyncHttpClient {
   public static native func Post(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PostForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
 
-  @if(ModuleExists("RedData"))
+  @if(ModuleExists("RedData.Json"))
   public static func PostJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
     let requestHeaders: array<HttpHeader> = [
       HttpHeader.Create("Content-Type", "application/json; charset=utf-8")
@@ -22,7 +22,7 @@ public native class AsyncHttpClient {
   public static native func Put(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PutForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
 
-  @if(ModuleExists("RedData"))
+  @if(ModuleExists("RedData.Json"))
   public static func PutJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
     let requestHeaders: array<HttpHeader> = [
       HttpHeader.Create("Content-Type", "application/json; charset=utf-8")
@@ -39,7 +39,7 @@ public native class AsyncHttpClient {
   public static native func Patch(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PatchForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
 
-  @if(ModuleExists("RedData"))
+  @if(ModuleExists("RedData.Json"))
   public static func PatchJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
     let requestHeaders: array<HttpHeader> = [
       HttpHeader.Create("Content-Type", "application/json; charset=utf-8")

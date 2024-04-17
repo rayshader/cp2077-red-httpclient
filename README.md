@@ -21,6 +21,12 @@ CET.
 
 ## Usage
 
+All features are defined in module `RedHttpClient`. You need to import it with:
+```swift
+import RedHttpClient.*
+import RedData.Json.* // When using Json from RedData.
+```
+
 You can find examples for both Redscript and Lua (CET) in [examples/].
 
 ### HttpResponse

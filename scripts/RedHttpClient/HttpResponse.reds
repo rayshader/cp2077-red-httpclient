@@ -9,7 +9,7 @@ public native class HttpResponse {
 
   public native func GetText() -> String;
 
-  @if(ModuleExists("RedData"))
+  @if(ModuleExists("RedData.Json"))
   public func GetJson() -> ref<JsonVariant> {
     return ParseJson(this.GetText());
   }

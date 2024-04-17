@@ -1,3 +1,6 @@
+import RedData.Json.*
+import RedHttpClient.*
+
 public class HttpClientTest extends BaseTest {
 
   public func Init() {
