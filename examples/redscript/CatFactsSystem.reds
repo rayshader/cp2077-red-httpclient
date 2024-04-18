@@ -1,5 +1,7 @@
 // Copy file into r6\scripts\Awesome\
 import Codeware.*
+import RedData.Json.*
+import RedHttpClient.*
 
 public struct CatFactDto {
   public let createdAt: String;
