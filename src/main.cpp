@@ -2,6 +2,7 @@
 #include <RedLib.hpp>
 
 #include "Config.h"
+#include "HttpClient.h"
 
 namespace RedHttpClient {
 
@@ -11,9 +12,11 @@ RED4EXT_C_EXPORT bool RED4EXT_CALL Main(RED4ext::PluginHandle p_handle,
   switch (p_reason) {
     case RED4ext::EMainReason::Load: {
       Red::TypeInfoRegistrar::RegisterDiscovered();
+      HttpClient::load(p_sdk, p_handle);
       break;
     }
     case RED4ext::EMainReason::Unload: {
+      HttpClient::unload();
       break;
     }
   }

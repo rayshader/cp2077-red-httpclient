@@ -10,16 +10,23 @@ CET.
 
 ## Compatibility
 - Cyberpunk 2077 v2.12
-- [Redscript] 0.5.17+
+- [Redscript] 0.5.18+
 - [Cyber Engine Tweaks] 1.31.0+
 
 ## Installation
 1. Install requirements:
-  - [RED4ext] v1.23.0+
-  - [RedData] v0.1.0+
+  - [RED4ext] v1.24.0+
+  - [RedData] v0.2.0+
+  - [RedFileSystem] v0.5.0+ is recommended
 2. Extract the [latest archive] into the Cyberpunk 2077 directory.
 
 ## Usage
+
+It logs all requests and responses by default, in 
+`red4ext/logs/redhttpclient-YYYY-MM-DD-HH-mm-ss.log`. Logging can be disabled  
+in file `red4ext/plugins/RedFileSystem/storages/RedHttpClient/config.json`.
+User need to change value of `logging` to `false`. File is created after 
+running the game when it isn't found.
 
 All features are defined in module `RedHttpClient`. You need to import it with:
 ```swift
@@ -269,5 +276,6 @@ node bundle.mjs
 [latest archive]: https://github.com/rayshader/cp2077-red-httpclient/releases/latest
 [Codeware]: https://github.com/psiberx/cp2077-codeware/wiki#lifecycle
 [RedData]: https://github.com/rayshader/cp2077-red-data
+[RedFileSystem]: https://github.com/rayshader/cp2077-red-filesystem
 [examples/]: https://github.com/rayshader/cp2077-red-httpclient/tree/master/examples
 [Redscript Wiki]: https://wiki.redmodding.org/redscript/language/patterns#heterogeneous-array-literals

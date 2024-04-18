@@ -6,20 +6,38 @@
 #include <RedLib.hpp>
 
 #include "HttpHeader.h"
+#include "HttpMethod.h"
 #include "HttpPair.h"
 #include "HttpResponse.h"
+#include "Settings.h"
 
 namespace RedHttpClient {
 
 class HttpClient : public Red::IScriptable {
  public:
   static const cpr::SslOptions ssl_options;
+  static Settings settings;
+  static Red::Logger* logger;
+  static Red::PluginHandle handle;
 
   static bool is_secure(const Red::CString& p_url);
   static cpr::Header build_headers(const HttpHeaders& p_headers);
   static HttpHeaders get_headers(const cpr::Response& p_response);
 
+  static void log_request(HttpMethod p_method, const Red::CString& p_url,
+                          const Red::CString& p_body,
+                          const cpr::Header& p_headers);
+  static void log_request_form(HttpMethod p_method, const Red::CString& p_url,
+                               const Red::DynArray<HttpPair>& p_form,
+                               const cpr::Header& p_headers);
+  static void log_response(const cpr::Response& p_response);
+
  public:
+  static void load(const RED4ext::Sdk* p_sdk, const Red::PluginHandle& p_handle);
+  static void start();
+  static void stop();
+  static void unload();
+
   static Red::Handle<HttpResponse> get(
     const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> post(

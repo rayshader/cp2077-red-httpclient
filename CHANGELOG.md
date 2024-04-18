@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- add missing headers in request when using `HttpClient.Delete()` / `AsyncHttpClient.Delete()`. 
+- add missing headers in request when using `HttpClient.Delete()` / `AsyncHttpClient.Delete()`.
+
+### Added
+- log requests and responses in `red4ext/logs/redhttpclient-YYYY-MM-DD-HH-mm-ss.log` (enabled by default).
+- enable / disable logging in `red4ext/plugins/RedFileSystem/storages/RedHttpClient/config.json`.
 
 ------------------------
 

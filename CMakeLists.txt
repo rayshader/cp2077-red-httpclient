@@ -11,9 +11,11 @@ set(INC_FILES
         src/HttpCallback.h
         src/HttpClient.h
         src/HttpHeader.h
+        src/HttpMethod.h
         src/HttpPair.h
         src/HttpResponse.h
         src/HttpStatus.h
+        src/Settings.h
 )
 
 set(SRC_FILES
