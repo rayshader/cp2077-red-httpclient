@@ -3,32 +3,23 @@ import Codeware.*
 import RedData.Json.*
 import RedHttpClient.*
 
-public struct CatFactDto {
-  public let createdAt: String;
-  public let updatedAt: String;
-  public let text: String;
+public class CatFactDto {
+  let createdAt: String;
+  let updatedAt: String;
+  let text: String;
 
-  public static func CreateFromArray(json: ref<JsonArray>) -> array<CatFactDto> {
-    let facts: array<CatFactDto> = [];
+  public static func FromJsonArray(json: ref<JsonArray>) -> array<ref<CatFactDto>> {
+    let facts: array<ref<CatFactDto>> = [];
     let size: Uint32 = json.GetSize();
     let i: Uint32 = 0u;
 
     while i < size {
-      let fact = CatFactDto.Create(json.GetItem(i) as JsonObject);
+      let fact = FromJson(json.GetItem(i) as JsonObject, n"CatFactDto") as CatFactDto;
 
       ArrayPush(facts, fact);
       i += 1u;
     }
     return facts;
-  }
-
-  public static func Create(fact: ref<JsonObject>) -> CatFactDto {
-    let self: CatFactDto;
-
-    self.createdAt = fact.GetKeyString("createdAt");
-    self.updatedAt = fact.GetKeyString("updatedAt");
-    self.text = fact.GetKeyString("text");
-    return self;
   }
 }
 
@@ -95,7 +86,7 @@ public class CatFactsSystem extends ScriptableSystem {
       this.Shutdown();
       return;
     }
-    let facts: array<CatFactDto> = CatFactDto.CreateFromArray(json as JsonArray);
+    let facts: array<ref<CatFactDto>> = CatFactDto.FromJsonArray(json as JsonArray);
 
     LogChannel(n"Info", s"\(ArraySize(facts)) cat facts:");
     for fact in facts {
