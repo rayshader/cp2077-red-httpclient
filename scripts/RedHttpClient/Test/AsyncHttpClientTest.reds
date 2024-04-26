@@ -102,7 +102,7 @@ public class AsyncHttpClientTest extends BaseTest {
 
     this.ExpectString("POST FORM -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
     this.ExpectString("POST FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
-      done.Call();
+    done.Call();
   }
 
   private cb func Test_PostJson(done: ref<CallbackTest>) {
@@ -196,7 +196,7 @@ public class AsyncHttpClientTest extends BaseTest {
 
     this.ExpectString("PUT FORM -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
     this.ExpectString("PUT FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
-      done.Call();
+    done.Call();
   }
 
   private cb func Test_PutJson(done: ref<CallbackTest>) {
@@ -290,7 +290,7 @@ public class AsyncHttpClientTest extends BaseTest {
 
     this.ExpectString("PATCH FORM -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
     this.ExpectString("PATCH FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
-      done.Call();
+    done.Call();
   }
 
   private cb func Test_PatchJson(done: ref<CallbackTest>) {
