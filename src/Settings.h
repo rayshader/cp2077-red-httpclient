@@ -44,7 +44,7 @@ class Settings {
            << "}";
     auto json = RedData::Json::ParseJson(stream.str());
 
-    config.WriteJson(json);
+    config.WriteJson(json, "  ");
   }
 
   void read_config() {
