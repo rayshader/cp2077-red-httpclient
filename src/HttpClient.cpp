@@ -30,14 +30,10 @@ cpr::Header HttpClient::build_headers(
 }
 
 HttpHeaders HttpClient::get_headers(const cpr::Response& p_response) {
-  Red::DynArray<HttpHeader> headers;
+  HttpHeaders headers;
 
   for (const auto& header : p_response.header) {
-    HttpHeader http_header;
-
-    http_header.name = header.first;
-    http_header.value = header.second;
-    headers.PushBack(http_header);
+    headers.EmplaceBack(header.first, header.second);
   }
   return headers;
 }
@@ -82,7 +78,7 @@ void HttpClient::log_request(const HttpMethod p_method,
 
 void HttpClient::log_request_form(const HttpMethod p_method,
                                   const Red::CString& p_url,
-                                  const Red::DynArray<HttpPair>& p_form,
+                                  const HttpPairs& p_form,
                                   const cpr::Header& p_headers) {
   if (logger == nullptr || handle == nullptr || !settings.can_log()) {
     return;
@@ -197,7 +193,7 @@ Red::Handle<HttpResponse> HttpClient::post(
 }
 
 Red::Handle<HttpResponse> HttpClient::post_form(
-  const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+  const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
   if (!is_secure(p_url)) {
     return {};
@@ -242,7 +238,7 @@ Red::Handle<HttpResponse> HttpClient::put(
 }
 
 Red::Handle<HttpResponse> HttpClient::put_form(
-  const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+  const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
   if (!is_secure(p_url)) {
     return {};
@@ -289,7 +285,7 @@ Red::Handle<HttpResponse> HttpClient::patch(
 }
 
 Red::Handle<HttpResponse> HttpClient::patch_form(
-  const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+  const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
   if (!is_secure(p_url)) {
     return {};

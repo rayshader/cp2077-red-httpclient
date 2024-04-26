@@ -24,21 +24,21 @@ class AsyncHttpClient : public Red::IScriptable {
                    const Red::Optional<HttpHeaders>& p_headers);
   static void post_form(const HttpCallback& p_callback,
                         const Red::CString& p_url,
-                        const Red::DynArray<HttpPair>& p_form,
+                        const HttpPairs& p_form,
                         const Red::Optional<HttpHeaders>& p_headers);
   static void put(const HttpCallback& p_callback, const Red::CString& p_url,
                   const Red::CString& p_body,
                   const Red::Optional<HttpHeaders>& p_headers);
   static void put_form(const HttpCallback& p_callback,
                        const Red::CString& p_url,
-                       const Red::DynArray<HttpPair>& p_form,
+                       const HttpPairs& p_form,
                        const Red::Optional<HttpHeaders>& p_headers);
   static void patch(const HttpCallback& p_callback, const Red::CString& p_url,
                     const Red::CString& p_body,
                     const Red::Optional<HttpHeaders>& p_headers);
   static void patch_form(const HttpCallback& p_callback,
                          const Red::CString& p_url,
-                         const Red::DynArray<HttpPair>& p_form,
+                         const HttpPairs& p_form,
                          const Red::Optional<HttpHeaders>& p_headers);
   static void delete_(const HttpCallback& p_callback, const Red::CString& p_url,
                       const Red::Optional<HttpHeaders>& p_headers);

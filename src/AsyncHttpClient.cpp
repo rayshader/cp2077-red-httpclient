@@ -59,7 +59,7 @@ void AsyncHttpClient::post(const HttpCallback& p_callback,
 
 void AsyncHttpClient::post_form(const HttpCallback& p_callback,
                                 const Red::CString& p_url,
-                                const Red::DynArray<HttpPair>& p_form,
+                                const HttpPairs& p_form,
                                 const Red::Optional<HttpHeaders>& p_headers) {
   if (!HttpClient::is_secure(p_url)) {
     p_callback({});
@@ -103,7 +103,7 @@ void AsyncHttpClient::put(const HttpCallback& p_callback,
 
 void AsyncHttpClient::put_form(const HttpCallback& p_callback,
                                const Red::CString& p_url,
-                               const Red::DynArray<HttpPair>& p_form,
+                               const HttpPairs& p_form,
                                const Red::Optional<HttpHeaders>& p_headers) {
   if (!HttpClient::is_secure(p_url)) {
     p_callback({});
@@ -147,7 +147,7 @@ void AsyncHttpClient::patch(const HttpCallback& p_callback,
 
 void AsyncHttpClient::patch_form(const HttpCallback& p_callback,
                                  const Red::CString& p_url,
-                                 const Red::DynArray<HttpPair>& p_form,
+                                 const HttpPairs& p_form,
                                  const Red::Optional<HttpHeaders>& p_headers) {
   if (!HttpClient::is_secure(p_url)) {
     p_callback({});

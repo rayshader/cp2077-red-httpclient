@@ -11,6 +11,8 @@ struct HttpPair {
   Red::CString value;
 };
 
+using HttpPairs = Red::DynArray<HttpPair>;
+
 }  // namespace RedHttpClient
 
 RTTI_DEFINE_CLASS(RedHttpClient::HttpPair, {

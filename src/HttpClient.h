@@ -28,12 +28,13 @@ class HttpClient : public Red::IScriptable {
                           const Red::CString& p_body,
                           const cpr::Header& p_headers);
   static void log_request_form(HttpMethod p_method, const Red::CString& p_url,
-                               const Red::DynArray<HttpPair>& p_form,
+                               const HttpPairs& p_form,
                                const cpr::Header& p_headers);
   static void log_response(const cpr::Response& p_response);
 
  public:
-  static void load(const RED4ext::Sdk* p_sdk, const Red::PluginHandle& p_handle);
+  static void load(const RED4ext::Sdk* p_sdk,
+                   const Red::PluginHandle& p_handle);
   static void start();
   static void stop();
   static void unload();
@@ -44,19 +45,19 @@ class HttpClient : public Red::IScriptable {
     const Red::CString& p_url, const Red::CString& p_body,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> post_form(
-    const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+    const Red::CString& p_url, const HttpPairs& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> put(
     const Red::CString& p_url, const Red::CString& p_body,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> put_form(
-    const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+    const Red::CString& p_url, const HttpPairs& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> patch(
     const Red::CString& p_url, const Red::CString& p_body,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> patch_form(
-    const Red::CString& p_url, const Red::DynArray<HttpPair>& p_form,
+    const Red::CString& p_url, const HttpPairs& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> delete_(
     const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
