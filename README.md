@@ -11,7 +11,7 @@ CET.
 ## Compatibility
 - Cyberpunk 2077 v2.12
 - [Redscript] 0.5.18+
-- [Cyber Engine Tweaks] 1.31.0+
+- [Cyber Engine Tweaks] 1.32.0+
 
 ## Installation
 1. Install requirements:
@@ -37,6 +37,17 @@ import RedData.Json.* // When using Json from RedData.
 You can find examples for both Redscript and Lua (CET) in [examples/].
 
 ### HttpResponse
+```swift
+GetStatus() -> HttpStatus;
+GetStatusCode() -> Int32;
+
+GetHeaders() -> array<HttpHeader>;
+HasHeader(header: String) -> Bool;
+GetHeader(header: String) -> String;
+
+GetText() -> String;
+GetJson() -> ref<JsonVariant>; // only with RedData.Json
+```
 
 After sending an HTTP request, you should receive a `HttpResponse` whether 
 you're using `HttpClient` or `AsyncHttpClient` (see after).
@@ -144,6 +155,7 @@ PatchJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -
 Delete(url: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 ```
 
+> [!NOTE]  
 > Delete is not implemented to send a body in HTTP request. If you need it, 
 > feel free to fill an issue.
 
@@ -220,6 +232,7 @@ PatchJson(callback: ref<HttpCallback>, url: String, body: ref<JsonVariant>, opt 
 Delete(callback: ref<HttpCallback>, url: String, opt headers: array<HttpHeader>) -> Void;
 ```
 
+> [!NOTE]  
 > Delete is not implemented to send a body in HTTP request. If you need it, 
 > feel free to fill an issue.
 
