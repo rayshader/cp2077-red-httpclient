@@ -78,6 +78,6 @@ enum class HttpStatus {
 
 }
 
-//RTTI_MAP_TYPE_NAME(RedHttpClient::HttpStatus, "RedHttpClient.HttpStatus")
+RTTI_MAP_TYPE_NAME(RedHttpClient::HttpStatus, "RedHttpClient.HttpStatus")
 
 #endif  //REDHTTPCLIENT_HTTPSTATUS_HPP

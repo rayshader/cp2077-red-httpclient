@@ -8,7 +8,7 @@ This header-only library provides an API wrapper for [RedHttpClient] plugin.
 # Getting started
 
 ## Compatibility
-- [RedHttpClient] v0.3.0
+- [RedHttpClient] v0.3.1
 
 ## Requirements
 - [RED4ext.SDK]
