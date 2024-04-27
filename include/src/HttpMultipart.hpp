@@ -20,6 +20,8 @@ class HttpMultipart {
 
   explicit operator bool() const noexcept { return wrapper; }
 
+  Red::Handle<Red::IScriptable> GetHandle() const { return wrapper; }
+
   inline void AddPart(const Red::CString& name,
                       const Red::CString& value) const {
     Red::CallVirtual(wrapper, "AddPart", name, value);
