@@ -14,7 +14,6 @@ This header-only library provides an API wrapper for [RedHttpClient] plugin.
 - [RED4ext.SDK]
 - [RedLib]
 - [RedData]
-- [RedFileSystem]
 
 ## Installation
 
@@ -51,7 +50,7 @@ bool isDetected = RedHttpClient::IsDetected();
 This API is a mirror of redscript declarations.
 
 You can test whether an instance is defined using `operator bool()`. It works
-for `HttpResponse`:
+for `HttpResponse` and `HttpMultipart`:
 ```cpp
 RedHttpClient::HttpResponse response;
 
@@ -69,5 +68,4 @@ Contributions are welcome, feel free to fill an issue or a PR.
 [RED4ext.SDK]: https://github.com/WopsS/RED4ext.SDK
 [RedLib]: https://github.com/psiberx/cp2077-red-lib
 [RedData]: https://github.com/rayshader/cp2077-red-data
-[RedFileSystem]: https://github.com/rayshader/cp2077-red-filesystem
 [RedHttpClient]: https://github.com/rayshader/cp2077-red-httpclient
