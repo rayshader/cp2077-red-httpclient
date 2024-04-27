@@ -1,5 +1,5 @@
-#ifndef REDHTTPCLIENT_ENUMS_HPP
-#define REDHTTPCLIENT_ENUMS_HPP
+#ifndef REDHTTPCLIENT_HTTPSTATUS_HPP
+#define REDHTTPCLIENT_HTTPSTATUS_HPP
 
 #include <RedLib.hpp>
 
@@ -80,4 +80,4 @@ enum class HttpStatus {
 
 //RTTI_MAP_TYPE_NAME(RedHttpClient::HttpStatus, "RedHttpClient.HttpStatus")
 
-#endif  //REDHTTPCLIENT_ENUMS_HPP
+#endif  //REDHTTPCLIENT_HTTPSTATUS_HPP
