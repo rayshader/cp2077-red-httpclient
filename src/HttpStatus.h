@@ -78,6 +78,6 @@ enum class HttpStatus {
 
 }
 
-RTTI_DEFINE_ENUM(RedHttpClient::HttpStatus);
+RTTI_DEFINE_ENUM(RedHttpClient::HttpStatus, "RedHttpClient.HttpStatus")
 
 #endif  //REDHTTPCLIENT_HTTPSTATUS_H
