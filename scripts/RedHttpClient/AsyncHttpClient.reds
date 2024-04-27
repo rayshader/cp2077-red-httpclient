@@ -4,6 +4,7 @@ public native class AsyncHttpClient {
 
   public static native func Post(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PostForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
+  public static native func PostMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PostJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
@@ -21,6 +22,7 @@ public native class AsyncHttpClient {
 
   public static native func Put(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PutForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
+  public static native func PutMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PutJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
@@ -38,6 +40,7 @@ public native class AsyncHttpClient {
 
   public static native func Patch(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
   public static native func PatchForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
+  public static native func PatchMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PatchJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {

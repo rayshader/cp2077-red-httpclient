@@ -81,6 +81,25 @@ void AsyncHttpClient::post_form(const HttpCallback& p_callback,
   queue_request(response.share(), p_callback);
 }
 
+void AsyncHttpClient::post_multipart(
+  const HttpCallback& p_callback, const Red::CString& p_url,
+  const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!HttpClient::is_secure(p_url)) {
+    p_callback({});
+    return;
+  }
+  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+
+  HttpClient::log_request_multipart(HttpMethod::POST, p_url, p_form,
+                                    request_headers);
+  cpr::AsyncResponse response =
+    cpr::PostAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
+                   p_form->get(), request_headers);
+
+  queue_request(response.share(), p_callback);
+}
+
 void AsyncHttpClient::put(const HttpCallback& p_callback,
                           const Red::CString& p_url, const Red::CString& p_body,
                           const Red::Optional<HttpHeaders>& p_headers) {
@@ -120,6 +139,25 @@ void AsyncHttpClient::put_form(const HttpCallback& p_callback,
   cpr::AsyncResponse response =
     cpr::PutAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
                   cpr::Payload{values.begin(), values.end()}, request_headers);
+
+  queue_request(response.share(), p_callback);
+}
+
+void AsyncHttpClient::put_multipart(
+  const HttpCallback& p_callback, const Red::CString& p_url,
+  const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!HttpClient::is_secure(p_url)) {
+    p_callback({});
+    return;
+  }
+  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+
+  HttpClient::log_request_multipart(HttpMethod::PUT, p_url, p_form,
+                                    request_headers);
+  cpr::AsyncResponse response =
+    cpr::PutAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
+                  p_form->get(), request_headers);
 
   queue_request(response.share(), p_callback);
 }
@@ -165,6 +203,25 @@ void AsyncHttpClient::patch_form(const HttpCallback& p_callback,
   cpr::AsyncResponse response = cpr::PatchAsync(
     HttpClient::ssl_options, cpr::Url{p_url.c_str()},
     cpr::Payload{values.begin(), values.end()}, request_headers);
+
+  queue_request(response.share(), p_callback);
+}
+
+void AsyncHttpClient::patch_multipart(
+  const HttpCallback& p_callback, const Red::CString& p_url,
+  const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!HttpClient::is_secure(p_url)) {
+    p_callback({});
+    return;
+  }
+  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+
+  HttpClient::log_request_multipart(HttpMethod::PATCH, p_url, p_form,
+                                    request_headers);
+  cpr::AsyncResponse response =
+    cpr::PatchAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
+                    p_form->get(), request_headers);
 
   queue_request(response.share(), p_callback);
 }

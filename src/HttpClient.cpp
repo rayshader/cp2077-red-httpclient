@@ -98,6 +98,28 @@ void HttpClient::log_request_form(const HttpMethod p_method,
   log_request(p_method, p_url, body.c_str(), p_headers);
 }
 
+void HttpClient::log_request_multipart(const HttpMethod p_method,
+                                       const Red::CString& p_url,
+                                       const Red::Handle<HttpMultipart>& p_form,
+                                       const cpr::Header& p_headers) {
+  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
+    return;
+  }
+  cpr::Multipart multipart = p_form->get();
+  const std::string boundary = "-----------------------------52414e444f4d";
+  std::string body;
+
+  for (const auto& part : multipart.parts) {
+    body += boundary + "\n";
+    body += "Content-Disposition: form-data; name=\"" + part.name + "\"\n";
+    body += "\n";
+    body += part.value + "\n";
+  }
+  body += "\n";
+  body += boundary;
+  log_request(p_method, p_url, body.c_str(), p_headers);
+}
+
 void HttpClient::log_response(const cpr::Response& p_response) {
   if (logger == nullptr || handle == nullptr || !settings.can_log()) {
     return;
@@ -216,6 +238,24 @@ Red::Handle<HttpResponse> HttpClient::post_form(
                                        response.text);
 }
 
+Red::Handle<HttpResponse> HttpClient::post_multipart(
+  const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
+  cpr::Header request_headers = build_headers(p_headers.value);
+
+  log_request_multipart(HttpMethod::POST, p_url, p_form, request_headers);
+  cpr::Response response = cpr::Post(ssl_options, cpr::Url{p_url.c_str()},
+                                     p_form->get(), request_headers);
+  Red::DynArray<HttpHeader> headers = get_headers(response);
+
+  log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
+}
+
 Red::Handle<HttpResponse> HttpClient::put(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
@@ -254,6 +294,24 @@ Red::Handle<HttpResponse> HttpClient::put_form(
   cpr::Response response =
     cpr::Put(ssl_options, cpr::Url{p_url.c_str()},
              cpr::Payload{values.begin(), values.end()}, request_headers);
+  Red::DynArray<HttpHeader> headers = get_headers(response);
+
+  log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
+}
+
+Red::Handle<HttpResponse> HttpClient::put_multipart(
+  const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
+  cpr::Header request_headers = build_headers(p_headers.value);
+
+  log_request_multipart(HttpMethod::PUT, p_url, p_form, request_headers);
+  cpr::Response response = cpr::Put(ssl_options, cpr::Url{p_url.c_str()},
+                                    p_form->get(), request_headers);
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
   log_response(response);
@@ -301,6 +359,24 @@ Red::Handle<HttpResponse> HttpClient::patch_form(
   cpr::Response response =
     cpr::Patch(ssl_options, cpr::Url{p_url.c_str()},
                cpr::Payload{values.begin(), values.end()}, request_headers);
+  Red::DynArray<HttpHeader> headers = get_headers(response);
+
+  log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
+}
+
+Red::Handle<HttpResponse> HttpClient::patch_multipart(
+  const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
+  cpr::Header request_headers = build_headers(p_headers.value);
+
+  log_request_multipart(HttpMethod::PATCH, p_url, p_form, request_headers);
+  cpr::Response response = cpr::Patch(ssl_options, cpr::Url{p_url.c_str()},
+                                      p_form->get(), request_headers);
   Red::DynArray<HttpHeader> headers = get_headers(response);
 
   log_response(response);

@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- enable / disable logging when loading option from `config.json`.
+
+### Added
+- support to send `multipart/form-data` with `HttpClient` and `AsyncHttpClient`.
+- class `HttpMultipart` to add / set / get parts, without support for files / buffers.
 
 ------------------------
 

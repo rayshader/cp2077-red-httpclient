@@ -12,6 +12,7 @@ set(INC_FILES
         src/HttpClient.h
         src/HttpHeader.h
         src/HttpMethod.h
+        src/HttpMultipart.h
         src/HttpPair.h
         src/HttpResponse.h
         src/HttpStatus.h

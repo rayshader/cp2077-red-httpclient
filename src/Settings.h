@@ -5,7 +5,7 @@
 #include <RedData.hpp>
 #include <RedFileSystem.hpp>
 #include <RedLib.hpp>
-#include <iostream>
+#include <sstream>
 
 namespace RedHttpClient {
 

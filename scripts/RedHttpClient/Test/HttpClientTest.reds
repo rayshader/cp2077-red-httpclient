@@ -96,6 +96,26 @@ public class HttpClientTest extends BaseTest {
     this.ExpectString("POST FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
   }
 
+  private cb func Test_PostMultipart() {
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "HttpClient");
+    form.AddPart("version", "0.3.0");
+    let response = HttpClient.PostMultipart("https://postman-echo.com/post", form);
+
+    this.ExpectString("POST MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("POST MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("POST MULTIPART -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("POST MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
+  }
+
   private cb func Test_PostJson() {
     let json = ParseJson("{\"client\": \"HttpClient\", \"version\": 42, \"items\": []}");
     let response = HttpClient.PostJson("https://postman-echo.com/post", json);
@@ -153,6 +173,26 @@ public class HttpClientTest extends BaseTest {
     this.ExpectString("PUT FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
   }
 
+  private cb func Test_PutMultipart() {
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "HttpClient");
+    form.AddPart("version", "0.3.0");
+    let response = HttpClient.PutMultipart("https://postman-echo.com/put", form);
+
+    this.ExpectString("PUT MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("PUT MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("PUT MULTIPART -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("PUT MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
+  }
+
   private cb func Test_PutJson() {
     let json = ParseJson("{\"client\": \"HttpClient\", \"version\": 42, \"items\": []}");
     let response = HttpClient.PutJson("https://postman-echo.com/put", json);
@@ -208,6 +248,26 @@ public class HttpClientTest extends BaseTest {
 
     this.ExpectString("PATCH FORM -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
     this.ExpectString("PATCH FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
+  }
+
+  private cb func Test_PatchMultipart() {
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "HttpClient");
+    form.AddPart("version", "0.3.0");
+    let response = HttpClient.PatchMultipart("https://postman-echo.com/patch", form);
+
+    this.ExpectString("PATCH MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("PATCH MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("PATCH MULTIPART -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("PATCH MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
   }
 
   private cb func Test_PatchJson() {

@@ -7,6 +7,7 @@
 
 #include "HttpCallback.h"
 #include "HttpHeader.h"
+#include "HttpMultipart.h"
 #include "HttpPair.h"
 
 namespace RedHttpClient {
@@ -23,23 +24,32 @@ class AsyncHttpClient : public Red::IScriptable {
                    const Red::CString& p_body,
                    const Red::Optional<HttpHeaders>& p_headers);
   static void post_form(const HttpCallback& p_callback,
-                        const Red::CString& p_url,
-                        const HttpPairs& p_form,
+                        const Red::CString& p_url, const HttpPairs& p_form,
                         const Red::Optional<HttpHeaders>& p_headers);
+  static void post_multipart(const HttpCallback& p_callback,
+                             const Red::CString& p_url,
+                             const Red::Handle<HttpMultipart>& p_form,
+                             const Red::Optional<HttpHeaders>& p_headers);
   static void put(const HttpCallback& p_callback, const Red::CString& p_url,
                   const Red::CString& p_body,
                   const Red::Optional<HttpHeaders>& p_headers);
   static void put_form(const HttpCallback& p_callback,
-                       const Red::CString& p_url,
-                       const HttpPairs& p_form,
+                       const Red::CString& p_url, const HttpPairs& p_form,
                        const Red::Optional<HttpHeaders>& p_headers);
+  static void put_multipart(const HttpCallback& p_callback,
+                            const Red::CString& p_url,
+                            const Red::Handle<HttpMultipart>& p_form,
+                            const Red::Optional<HttpHeaders>& p_headers);
   static void patch(const HttpCallback& p_callback, const Red::CString& p_url,
                     const Red::CString& p_body,
                     const Red::Optional<HttpHeaders>& p_headers);
   static void patch_form(const HttpCallback& p_callback,
-                         const Red::CString& p_url,
-                         const HttpPairs& p_form,
+                         const Red::CString& p_url, const HttpPairs& p_form,
                          const Red::Optional<HttpHeaders>& p_headers);
+  static void patch_multipart(const HttpCallback& p_callback,
+                              const Red::CString& p_url,
+                              const Red::Handle<HttpMultipart>& p_form,
+                              const Red::Optional<HttpHeaders>& p_headers);
   static void delete_(const HttpCallback& p_callback, const Red::CString& p_url,
                       const Red::Optional<HttpHeaders>& p_headers);
 
@@ -55,10 +65,13 @@ RTTI_DEFINE_CLASS(RedHttpClient::AsyncHttpClient, {
   RTTI_METHOD(get, "Get");
   RTTI_METHOD(post, "Post");
   RTTI_METHOD(post_form, "PostForm");
+  RTTI_METHOD(post_multipart, "PostMultipart");
   RTTI_METHOD(put, "Put");
   RTTI_METHOD(put_form, "PutForm");
+  RTTI_METHOD(put_multipart, "PutMultipart");
   RTTI_METHOD(patch, "Patch");
   RTTI_METHOD(patch_form, "PatchForm");
+  RTTI_METHOD(patch_multipart, "PatchMultipart");
   RTTI_METHOD(delete_, "Delete");
 });
 

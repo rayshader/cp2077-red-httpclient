@@ -4,6 +4,7 @@ public native class HttpClient {
 
   public static native func Post(url: String, body: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
   public static native func PostForm(url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+  public static native func PostMultipart(url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PostJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> ref<HttpResponse> {
@@ -21,6 +22,7 @@ public native class HttpClient {
 
   public static native func Put(url: String, body: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
   public static native func PutForm(url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+  public static native func PutMultipart(url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PutJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> ref<HttpResponse> {
@@ -38,6 +40,7 @@ public native class HttpClient {
 
   public static native func Patch(url: String, body: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
   public static native func PatchForm(url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+  public static native func PatchMultipart(url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 
   @if(ModuleExists("RedData.Json"))
   public static func PatchJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> ref<HttpResponse> {

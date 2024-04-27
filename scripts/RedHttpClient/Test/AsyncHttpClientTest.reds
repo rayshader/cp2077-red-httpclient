@@ -105,6 +105,33 @@ public class AsyncHttpClientTest extends BaseTest {
     done.Call();
   }
 
+  private cb func Test_PostMultipart(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_PostMultipart", [done]);
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "AsyncHttpClient");
+    form.AddPart("version", "0.3.0");
+    AsyncHttpClient.PostMultipart(callback, "https://postman-echo.com/post", form);
+  }
+
+  private cb func Async_PostMultipart(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("POST MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("POST MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("POST MULTIPART -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectString("POST MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
+    done.Call();
+  }
+
   private cb func Test_PostJson(done: ref<CallbackTest>) {
     let callback = HttpCallback.Create(this, n"Async_PostJson", [done]);
     let json = ParseJson("{\"client\": \"AsyncHttpClient\", \"version\": 42, \"items\": []}");
@@ -199,6 +226,33 @@ public class AsyncHttpClientTest extends BaseTest {
     done.Call();
   }
 
+  private cb func Test_PutMultipart(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_PutMultipart", [done]);
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "AsyncHttpClient");
+    form.AddPart("version", "0.3.0");
+    AsyncHttpClient.PutMultipart(callback, "https://postman-echo.com/put", form);
+  }
+
+  private cb func Async_PutMultipart(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("PUT MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("PUT MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("PUT MULTIPART -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectString("PUT MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
+    done.Call();
+  }
+
   private cb func Test_PutJson(done: ref<CallbackTest>) {
     let callback = HttpCallback.Create(this, n"Async_PutJson", [done]);
     let json = ParseJson("{\"client\": \"AsyncHttpClient\", \"version\": 42, \"items\": []}");
@@ -290,6 +344,33 @@ public class AsyncHttpClientTest extends BaseTest {
 
     this.ExpectString("PATCH FORM -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
     this.ExpectString("PATCH FORM -> $.version == '0.1.0'", jsonForm.GetKeyString("version"), "0.1.0");
+    done.Call();
+  }
+
+  private cb func Test_PatchMultipart(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_PatchMultipart", [done]);
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "AsyncHttpClient");
+    form.AddPart("version", "0.3.0");
+    AsyncHttpClient.PatchMultipart(callback, "https://postman-echo.com/patch", form);
+  }
+
+  private cb func Async_PatchMultipart(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("PATCH MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("PATCH MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("PATCH MULTIPART -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectString("PATCH MULTIPART -> $.version == '0.3.0'", jsonForm.GetKeyString("version"), "0.3.0");
     done.Call();
   }
 
