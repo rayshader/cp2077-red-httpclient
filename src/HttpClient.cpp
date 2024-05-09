@@ -156,8 +156,8 @@ void HttpClient::load(const RED4ext::Sdk* p_sdk,
     HttpClient::stop();
     return true;
   };
-  init.OnUpdate = nullptr;
-  init.OnExit = nullptr;
+  shutdown.OnUpdate = nullptr;
+  shutdown.OnExit = nullptr;
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Initialization, &init);
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Shutdown, &shutdown);
 }
