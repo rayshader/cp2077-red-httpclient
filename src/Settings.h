@@ -28,6 +28,9 @@ class Settings {
     RedFileSystem::FileSystemStatus status = storage.Exists("config.json");
 
     config = storage.GetFile("config.json");
+    if (!config) {
+      return;
+    }
     if (status != RedFileSystem::FileSystemStatus::True) {
       create_config();
     } else {
