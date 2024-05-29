@@ -9,7 +9,7 @@
 import * as fs from 'fs';
 import archiver from 'archiver';
 
-const PLUGIN_VERSION = '0.3.2';
+const PLUGIN_VERSION = '0.3.3';
 const PLUGIN_NAME = 'RedHttpClient';
 const PLUGIN_LICENSE = 'LICENSE';
 const PLUGIN_LIBRARY_PATH = `build/Release/${PLUGIN_NAME}.dll`;
