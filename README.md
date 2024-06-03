@@ -140,18 +140,18 @@ You can add / set / get parts of a form like this:
 ```swift
 let form: ref<HttpMultipart> = new HttpMultipart();
 
-form.AddPart("name1", "value1"); // Add new part
+form.AddPart("name1", "value1");    // Add new part
 form.SetPart("name1", "newvalue1"); // Replace value of name1
-form.SetPart("name2", "value2"); // Add new part too
-let value = form.GetPart("name2"); // value == "value2"
+form.SetPart("name2", "value2");    // Add new part too
+let value = form.GetPart("name2");  // value == "value2"
 ```
 
 Use `PostJson` to send Json data with:
 - Content-Type: `application/json; charset=utf-8`
 - Body: &lt;Json data&gt;
 
-Other functions below use the same behaviors for `[Method]Form` and 
-`[Method]Json`.
+Methods below use the same signature for `[Method]Form`, `[Method]Multipart` 
+and `[Method]Json`.
 
 #### PUT
 ```swift
@@ -229,7 +229,7 @@ Get(callback: HttpCallback, url: String, opt headers: array<HttpHeader>) -> Void
 ```swift
 Post(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
 PostForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
-PostMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+PostMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> Void;
 PostJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void;
 ```
 
@@ -237,7 +237,7 @@ PostJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt header
 ```swift
 Put(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
 PutForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
-PutMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+PutMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> Void;
 PutJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void;
 ```
 
@@ -245,7 +245,7 @@ PutJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers
 ```swift
 Patch(callback: HttpCallback, url: String, body: String, opt headers: array<HttpHeader>) -> Void;
 PatchForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
-PatchMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+PatchMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> Void;
 PatchJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void;
 ```
 
