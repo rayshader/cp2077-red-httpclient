@@ -171,12 +171,11 @@ PatchJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -
 
 #### DELETE
 ```swift
-Delete(url: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+Delete(url: String, opt body: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+DeleteForm(url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+DeleteMultipart(url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
+DeleteJson(url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> ref<HttpResponse>;
 ```
-
-> [!NOTE]  
-> Delete is not implemented to send a body in HTTP request. If you need it, 
-> feel free to fill an issue.
 
 ### AsyncHttpClient
 
@@ -251,12 +250,11 @@ PatchJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt heade
 
 #### DELETE
 ```swift
-Delete(callback: HttpCallback, url: String, opt headers: array<HttpHeader>) -> Void;
+Delete(callback: HttpCallback, url: String, opt body: String, opt headers: array<HttpHeader>) -> Void;
+DeleteForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
+DeleteMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> Void;
+DeleteJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void;
 ```
-
-> [!NOTE]  
-> Delete is not implemented to send a body in HTTP request. If you need it, 
-> feel free to fill an issue.
 
 # Development
 Contributions are welcome, feel free to fill an issue or a PR.

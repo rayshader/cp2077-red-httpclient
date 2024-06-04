@@ -74,7 +74,14 @@ class HttpClient : public Red::IScriptable {
     const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> delete_(
-    const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
+    const Red::CString& p_url, const Red::Optional<Red::CString>& p_body,
+    const Red::Optional<HttpHeaders>& p_headers);
+  static Red::Handle<HttpResponse> delete_form(
+    const Red::CString& p_url, const HttpPairs& p_form,
+    const Red::Optional<HttpHeaders>& p_headers);
+  static Red::Handle<HttpResponse> delete_multipart(
+    const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+    const Red::Optional<HttpHeaders>& p_headers);
 
   RTTI_IMPL_TYPEINFO(RedHttpClient::HttpClient);
   RTTI_IMPL_ALLOCATOR();
@@ -96,6 +103,8 @@ RTTI_DEFINE_CLASS(RedHttpClient::HttpClient, {
   RTTI_METHOD(patch_form, "PatchForm");
   RTTI_METHOD(patch_multipart, "PatchMultipart");
   RTTI_METHOD(delete_, "Delete");
+  RTTI_METHOD(delete_form, "DeleteForm");
+  RTTI_METHOD(delete_multipart, "DeleteMultipart");
 });
 
 #endif  //REDHTTPCLIENT_HTTPCLIENT_H

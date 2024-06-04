@@ -56,6 +56,22 @@ public native class AsyncHttpClient {
     AsyncHttpClient.Patch(callback, url, body.ToString(), requestHeaders);
   }
 
-  public static native func Delete(callback: HttpCallback, url: String, opt headers: array<HttpHeader>) -> Void;
+  public static native func Delete(callback: HttpCallback, url: String, opt body: String, opt headers: array<HttpHeader>) -> Void;
+  public static native func DeleteForm(callback: HttpCallback, url: String, form: array<HttpPair>, opt headers: array<HttpHeader>) -> Void;
+  public static native func DeleteMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, opt headers: array<HttpHeader>) -> Void;
+
+  @if(ModuleExists("RedData.Json"))
+  public static func DeleteJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void {
+    let requestHeaders: array<HttpHeader> = [
+      HttpHeader.Create("Content-Type", "application/json; charset=utf-8")
+    ];
+
+    for header in headers {
+      if StrCmp(header.name, "Content-Type", -1, true) != 0 {
+        ArrayPush(requestHeaders, header);
+      }
+    }
+    AsyncHttpClient.Delete(callback, url, body.ToString(), requestHeaders);
+  }
 
 }

@@ -51,7 +51,15 @@ class AsyncHttpClient : public Red::IScriptable {
                               const Red::Handle<HttpMultipart>& p_form,
                               const Red::Optional<HttpHeaders>& p_headers);
   static void delete_(const HttpCallback& p_callback, const Red::CString& p_url,
+                      const Red::Optional<Red::CString>& p_body,
                       const Red::Optional<HttpHeaders>& p_headers);
+  static void delete_form(const HttpCallback& p_callback,
+                          const Red::CString& p_url, const HttpPairs& p_form,
+                          const Red::Optional<HttpHeaders>& p_headers);
+  static void delete_multipart(const HttpCallback& p_callback,
+                               const Red::CString& p_url,
+                               const Red::Handle<HttpMultipart>& p_form,
+                               const Red::Optional<HttpHeaders>& p_headers);
 
   RTTI_IMPL_TYPEINFO(RedHttpClient::AsyncHttpClient);
   RTTI_IMPL_ALLOCATOR();
@@ -73,6 +81,8 @@ RTTI_DEFINE_CLASS(RedHttpClient::AsyncHttpClient, {
   RTTI_METHOD(patch_form, "PatchForm");
   RTTI_METHOD(patch_multipart, "PatchMultipart");
   RTTI_METHOD(delete_, "Delete");
+  RTTI_METHOD(delete_form, "DeleteForm");
+  RTTI_METHOD(delete_multipart, "DeleteMultipart");
 });
 
 #endif  //REDHTTPCLIENT_ASYNCHTTPCLIENT_H

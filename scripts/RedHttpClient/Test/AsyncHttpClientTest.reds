@@ -440,6 +440,89 @@ public class AsyncHttpClientTest extends BaseTest {
     done.Call();
   }
 
+  private cb func Test_DeleteForm(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_DeleteForm", [done]);
+    let form = [
+      HttpPair.Create("client", "AsyncHttpClient"),
+      HttpPair.Create("version", "0.4.0")
+    ];
+
+    AsyncHttpClient.DeleteForm(callback, "https://postman-echo.com/delete", form);
+  }
+
+  private cb func Async_DeleteForm(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("DELETE FORM -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE FORM -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("DELETE FORM -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectString("DELETE FORM -> $.version == '0.4.0'", jsonForm.GetKeyString("version"), "0.4.0");
+    done.Call();
+  }
+
+  private cb func Test_DeleteMultipart(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_DeleteMultipart", [done]);
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "AsyncHttpClient");
+    form.AddPart("version", "0.4.0");
+    AsyncHttpClient.DeleteMultipart(callback, "https://postman-echo.com/delete", form);
+  }
+
+  private cb func Async_DeleteMultipart(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("DELETE MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("DELETE MULTIPART -> $.client == 'AsyncHttpClient'", jsonForm.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectString("DELETE MULTIPART -> $.version == '0.4.0'", jsonForm.GetKeyString("version"), "0.4.0");
+    done.Call();
+  }
+
+  private cb func Test_DeleteJson(done: ref<CallbackTest>) {
+    let callback = HttpCallback.Create(this, n"Async_DeleteJson", [done]);
+    let json = ParseJson("{\"client\": \"AsyncHttpClient\", \"version\": 42, \"items\": []}");
+
+    AsyncHttpClient.DeleteJson(callback, "https://postman-echo.com/delete", json);
+  }
+
+  private cb func Async_DeleteJson(response: ref<HttpResponse>, data: array<Variant>) {
+    let done: ref<CallbackTest> = FromVariant(data[0]);
+
+    this.ExpectString("DELETE JSON -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE JSON -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      done.Call();
+      return;
+    }
+    json = json.GetKey("json") as JsonObject;
+    this.ExpectString("DELETE JSON -> $.client == 'AsyncHttpClient'", json.GetKeyString("client"), "AsyncHttpClient");
+    this.ExpectInt64("DELETE JSON -> $.version == 42", json.GetKeyInt64("version"), 42l);
+    let items = json.GetKey("items") as JsonArray;
+
+    this.ExpectBool("DELETE JSON -> $.items === [...]", items.IsArray(), true);
+    this.ExpectUint32("DELETE JSON -> $.items.length == 0", items.GetSize(), 0u);
+    done.Call();
+  }
+
   private cb func Test_Delete_WithoutSSL(done: ref<CallbackTest>) {
     let callback = HttpCallback.Create(this, n"Async_Delete_WithoutSSL", [done]);
 

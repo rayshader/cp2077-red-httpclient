@@ -307,4 +307,64 @@ public class HttpClientTest extends BaseTest {
     this.ExpectInt32("DELETE -> <empty>", StrLen(data), 0);
   }
 
+  private cb func Test_DeleteForm() {
+    let form = [
+      HttpPair.Create("client", "HttpClient"),
+      HttpPair.Create("version", "0.4.0")
+    ];
+    let response = HttpClient.DeleteForm("https://postman-echo.com/delete", form);
+
+    this.ExpectString("DELETE FORM -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE FORM -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("DELETE FORM -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("DELETE FORM -> $.version == '0.4.0'", jsonForm.GetKeyString("version"), "0.4.0");
+  }
+
+  private cb func Test_DeleteMultipart() {
+    let form = new HttpMultipart();
+
+    form.AddPart("client", "HttpClient");
+    form.AddPart("version", "0.4.0");
+    let response = HttpClient.DeleteMultipart("https://postman-echo.com/delete", form);
+
+    this.ExpectString("DELETE MULTIPART -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE MULTIPART -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    let jsonForm = json.GetKey("form") as JsonObject;
+
+    this.ExpectString("DELETE MULTIPART -> $.client == 'HttpClient'", jsonForm.GetKeyString("client"), "HttpClient");
+    this.ExpectString("DELETE MULTIPART -> $.version == '0.4.0'", jsonForm.GetKeyString("version"), "0.4.0");
+  }
+
+  private cb func Test_DeleteJson() {
+    let json = ParseJson("{\"client\": \"HttpClient\", \"version\": 42, \"items\": []}");
+    let response = HttpClient.DeleteJson("https://postman-echo.com/delete", json);
+
+    this.ExpectString("DELETE JSON -> HttpStatus.OK", s"\(response.GetStatus())", s"\(HttpStatus.OK)");
+    let json = response.GetJson() as JsonObject;
+
+    if !this.ExpectBool("DELETE JSON -> application/json", IsDefined(json), true) {
+      LogChannel(n"Error", "Response Json format invalid");
+      return;
+    }
+    json = json.GetKey("json") as JsonObject;
+    this.ExpectString("DELETE JSON -> $.client == 'HttpClient'", json.GetKeyString("client"), "HttpClient");
+    this.ExpectInt64("DELETE JSON -> $.version == 42", json.GetKeyInt64("version"), 42l);
+    let items = json.GetKey("items") as JsonArray;
+
+    this.ExpectBool("DELETE JSON -> $.items === [...]", items.IsArray(), true);
+    this.ExpectUint32("DELETE JSON -> $.items.length == 0", items.GetSize(), 0u);
+  }
+
 }
