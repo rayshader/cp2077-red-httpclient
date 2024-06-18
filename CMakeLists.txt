@@ -14,8 +14,10 @@ set(INC_FILES
         src/HttpMethod.h
         src/HttpMultipart.h
         src/HttpPair.h
+        src/HttpPlugin.h
         src/HttpResponse.h
         src/HttpStatus.h
+
         src/Settings.h
 )
 
@@ -24,6 +26,8 @@ set(SRC_FILES
 
         src/AsyncHttpClient.cpp
         src/HttpClient.cpp
+
+        src/HttpPlugin.cpp
 )
 
 source_group(include FILES INC_FILES)

@@ -5,13 +5,11 @@
 
 #include "HttpHeader.h"
 #include "HttpMethod.h"
+#include "HttpPlugin.h"
 
 namespace RedHttpClient {
 
-const cpr::SslOptions HttpClient::ssl_options = cpr::Ssl(cpr::ssl::TLSv1_2{});
-Settings HttpClient::settings;
-Red::Logger* HttpClient::logger = nullptr;
-Red::PluginHandle HttpClient::handle = nullptr;
+HttpPlugin* HttpClient::plugin = HttpPlugin::get();
 
 bool HttpClient::is_secure(const Red::CString& p_url) {
   std::string url(p_url.c_str());
@@ -38,141 +36,126 @@ HttpHeaders HttpClient::get_headers(const cpr::Response& p_response) {
   return headers;
 }
 
-const char* log_http_method(const HttpMethod p_method) {
-  switch (p_method) {
-    case HttpMethod::GET:
-      return "GET";
-    case HttpMethod::POST:
-      return "POST";
-    case HttpMethod::PUT:
-      return "PUT";
-    case HttpMethod::PATCH:
-      return "PATCH";
-    case HttpMethod::DELETE_:
-      return "DELETE";
-    default:
-      return nullptr;
+template <HttpMethod Method, class T>
+Red::Handle<HttpResponse> HttpClient::send(
+  const Red::CString& p_url, const T& p_body,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if constexpr (std::is_same<T, Red::CString>()) {
+    return send_body<Method>(p_url, p_body, p_headers);
+  } else if constexpr (std::is_same<T, HttpPairs>()) {
+    return send_form<Method>(p_url, p_body, p_headers);
+  } else if constexpr (std::is_same<T, Red::Handle<HttpMultipart>>()) {
+    return send_multipart<Method>(p_url, p_body, p_headers);
   }
+  return {};
 }
 
-void HttpClient::log_request(const HttpMethod p_method,
-                             const Red::CString& p_url,
-                             const Red::CString& p_body,
-                             const cpr::Header& p_headers) {
-  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
-    return;
+template <HttpMethod Method>
+Red::Handle<HttpResponse> HttpClient::send_body(
+  const Red::CString& p_url, const Red::CString& p_body,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
   }
-  const char* method = log_http_method(p_method);
+  cpr::Header request_headers = build_headers(p_headers.value);
 
-  logger->Info(handle, "HTTP request:");
-  logger->Info(handle, std::format("{} {}", method, p_url.c_str()).c_str());
-  for (const auto& header : p_headers) {
-    logger->Info(handle,
-                 std::format("{}: {}", header.first, header.second).c_str());
+  if (!request_headers.contains("Content-Type")) {
+    request_headers["Content-Type"] = "text/plain";
   }
-  if (p_body.length > 0) {
-    logger->Info(handle, "");
-    logger->Info(handle, p_body.c_str());
+  plugin->log_request(Method, p_url, p_body, request_headers);
+  cpr::Response response;
+
+  if constexpr (Method == HttpMethod::POST) {
+    response = cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                         cpr::Body{p_body.c_str()}, request_headers);
+  } else if constexpr (Method == HttpMethod::PUT) {
+    response = cpr::Put(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                        cpr::Body{p_body.c_str()}, request_headers);
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    response = cpr::Patch(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                          cpr::Body{p_body.c_str()}, request_headers);
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    response = cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                           cpr::Body{p_body.c_str()}, request_headers);
   }
+  Red::DynArray<HttpHeader> headers = get_headers(response);
+
+  plugin->log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
 }
 
-void HttpClient::log_request_form(const HttpMethod p_method,
-                                  const Red::CString& p_url,
-                                  const HttpPairs& p_form,
-                                  const cpr::Header& p_headers) {
-  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
-    return;
+template <HttpMethod Method>
+Red::Handle<HttpResponse> HttpClient::send_form(
+  const Red::CString& p_url, const HttpPairs& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
   }
-  std::string body;
+  std::vector<cpr::Pair> values;
 
-  for (int i = 0; i < p_form.size; i++) {
-    const auto& pair = p_form[i];
-
-    body += pair.key.c_str();
-    body += "=";
-    body += pair.value.c_str();
-    if (i + 1 < p_form.size) {
-      body += "&";
-    }
+  for (const auto& pair : p_form) {
+    values.emplace_back(pair.key.c_str(), pair.value.c_str());
   }
-  log_request(p_method, p_url, body.c_str(), p_headers);
+  cpr::Header request_headers = build_headers(p_headers.value);
+
+  plugin->log_request(Method, p_url, p_form, request_headers);
+  cpr::Response response;
+
+  if constexpr (Method == HttpMethod::POST) {
+    response =
+      cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                cpr::Payload{values.begin(), values.end()}, request_headers);
+  } else if constexpr (Method == HttpMethod::PUT) {
+    response =
+      cpr::Put(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+               cpr::Payload{values.begin(), values.end()}, request_headers);
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    response =
+      cpr::Patch(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                 cpr::Payload{values.begin(), values.end()}, request_headers);
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    response =
+      cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                  cpr::Payload{values.begin(), values.end()}, request_headers);
+  }
+  Red::DynArray<HttpHeader> headers = get_headers(response);
+
+  plugin->log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
 }
 
-void HttpClient::log_request_multipart(const HttpMethod p_method,
-                                       const Red::CString& p_url,
-                                       const Red::Handle<HttpMultipart>& p_form,
-                                       const cpr::Header& p_headers) {
-  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
-    return;
+template <HttpMethod Method>
+Red::Handle<HttpResponse> HttpClient::send_multipart(
+  const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
   }
-  cpr::Multipart multipart = p_form->get();
-  const std::string boundary = "-----------------------------52414e444f4d";
-  std::string body;
+  cpr::Header request_headers = build_headers(p_headers.value);
 
-  for (const auto& part : multipart.parts) {
-    body += boundary + "\n";
-    body += "Content-Disposition: form-data; name=\"" + part.name + "\"\n";
-    body += "\n";
-    body += part.value + "\n";
+  plugin->log_request(Method, p_url, p_form, request_headers);
+  cpr::Response response;
+
+  if constexpr (Method == HttpMethod::POST) {
+    response = cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                         p_form->get(), request_headers);
+  } else if constexpr (Method == HttpMethod::PUT) {
+    response = cpr::Put(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                        p_form->get(), request_headers);
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    response = cpr::Patch(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                          p_form->get(), request_headers);
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    response = cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                           p_form->get(), request_headers);
   }
-  body += "\n";
-  body += boundary;
-  log_request(p_method, p_url, body.c_str(), p_headers);
-}
+  Red::DynArray<HttpHeader> headers = get_headers(response);
 
-void HttpClient::log_response(const cpr::Response& p_response) {
-  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
-    return;
-  }
-  logger->Info(handle, "HTTP response:");
-  logger->Info(handle, std::format("HTTP/1.1 {} {}", p_response.status_code,
-                                   p_response.reason)
-                         .c_str());
-  for (const auto& header : p_response.header) {
-    logger->Info(handle,
-                 std::format("{}: {}", header.first, header.second).c_str());
-  }
-  if (!p_response.text.empty()) {
-    logger->Info(handle, "");
-    logger->Info(handle, p_response.text.c_str());
-  }
-}
-
-void HttpClient::load(const RED4ext::Sdk* p_sdk,
-                      const Red::PluginHandle& p_handle) {
-  logger = p_sdk->logger;
-  handle = p_handle;
-  Red::GameState init;
-
-  init.OnEnter = [](Red::CGameApplication* p_app) -> bool {
-    HttpClient::start();
-    return true;
-  };
-  init.OnUpdate = nullptr;
-  init.OnExit = nullptr;
-  Red::GameState shutdown;
-
-  shutdown.OnEnter = [](Red::CGameApplication* p_app) -> bool {
-    HttpClient::stop();
-    return true;
-  };
-  shutdown.OnUpdate = nullptr;
-  shutdown.OnExit = nullptr;
-  p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Initialization, &init);
-  p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Shutdown, &shutdown);
-}
-
-void HttpClient::start() {
-  settings.load();
-}
-
-void HttpClient::stop() {
-  settings.unload();
-}
-
-void HttpClient::unload() {
-  logger = nullptr;
-  handle = nullptr;
+  plugin->log_response(response);
+  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
+                                       response.text);
 }
 
 Red::Handle<HttpResponse> HttpClient::get(
@@ -182,12 +165,12 @@ Red::Handle<HttpResponse> HttpClient::get(
   }
   cpr::Header request_headers = build_headers(p_headers.value);
 
-  log_request(HttpMethod::GET, p_url, "", request_headers);
-  cpr::Response response =
-    cpr::Get(ssl_options, cpr::Url{p_url.c_str()}, request_headers);
+  plugin->log_request(HttpMethod::GET, p_url, "", request_headers);
+  cpr::Response response = cpr::Get(plugin->get_ssl_options(),
+                                    cpr::Url{p_url.c_str()}, request_headers);
   HttpHeaders headers = get_headers(response);
 
-  log_response(response);
+  plugin->log_response(response);
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
                                        response.text);
 }
@@ -195,255 +178,73 @@ Red::Handle<HttpResponse> HttpClient::get(
 Red::Handle<HttpResponse> HttpClient::post(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  log_request(HttpMethod::POST, p_url, p_body, request_headers);
-  cpr::Response response =
-    cpr::Post(ssl_options, cpr::Url{p_url.c_str()}, cpr::Body{p_body.c_str()},
-              request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::POST>(p_url, p_body, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::post_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_form(HttpMethod::POST, p_url, p_form, request_headers);
-  cpr::Response response =
-    cpr::Post(ssl_options, cpr::Url{p_url.c_str()},
-              cpr::Payload{values.begin(), values.end()}, request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::POST>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::post_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_multipart(HttpMethod::POST, p_url, p_form, request_headers);
-  cpr::Response response = cpr::Post(ssl_options, cpr::Url{p_url.c_str()},
-                                     p_form->get(), request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::POST>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::put(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  log_request(HttpMethod::PUT, p_url, p_body, request_headers);
-  cpr::Response response = cpr::Put(ssl_options, cpr::Url{p_url.c_str()},
-                                    cpr::Body{p_body.c_str()}, request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PUT>(p_url, p_body, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::put_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_form(HttpMethod::PUT, p_url, p_form, request_headers);
-  cpr::Response response =
-    cpr::Put(ssl_options, cpr::Url{p_url.c_str()},
-             cpr::Payload{values.begin(), values.end()}, request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PUT>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::put_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_multipart(HttpMethod::PUT, p_url, p_form, request_headers);
-  cpr::Response response = cpr::Put(ssl_options, cpr::Url{p_url.c_str()},
-                                    p_form->get(), request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PUT>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::patch(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  log_request(HttpMethod::PATCH, p_url, p_body, request_headers);
-
-  cpr::Response response =
-    cpr::Patch(ssl_options, cpr::Url{p_url.c_str()}, cpr::Body{p_body.c_str()},
-               request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PATCH>(p_url, p_body, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::patch_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_form(HttpMethod::PATCH, p_url, p_form, request_headers);
-  cpr::Response response =
-    cpr::Patch(ssl_options, cpr::Url{p_url.c_str()},
-               cpr::Payload{values.begin(), values.end()}, request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PATCH>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::patch_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_multipart(HttpMethod::PATCH, p_url, p_form, request_headers);
-  cpr::Response response = cpr::Patch(ssl_options, cpr::Url{p_url.c_str()},
-                                      p_form->get(), request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::PATCH>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::delete_(
   const Red::CString& p_url, const Red::Optional<Red::CString>& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-  Red::CString body = p_body.value;
-
-  log_request(HttpMethod::DELETE_, p_url, body, request_headers);
-  cpr::Response response =
-    cpr::Delete(ssl_options, cpr::Url{p_url.c_str()}, cpr::Body{body.c_str()},
-                request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::DELETE_>(p_url, p_body.value, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::delete_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_form(HttpMethod::DELETE_, p_url, p_form, request_headers);
-  cpr::Response response =
-    cpr::Delete(ssl_options, cpr::Url{p_url.c_str()},
-                cpr::Payload{values.begin(), values.end()}, request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::DELETE_>(p_url, p_form, p_headers);
 }
 
 Red::Handle<HttpResponse> HttpClient::delete_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
-  cpr::Header request_headers = build_headers(p_headers.value);
-
-  log_request_multipart(HttpMethod::DELETE_, p_url, p_form, request_headers);
-  cpr::Response response = cpr::Delete(ssl_options, cpr::Url{p_url.c_str()},
-                                       p_form->get(), request_headers);
-  Red::DynArray<HttpHeader> headers = get_headers(response);
-
-  log_response(response);
-  return Red::MakeHandle<HttpResponse>(response.status_code, headers,
-                                       response.text);
+  return send<HttpMethod::DELETE_>(p_url, p_form, p_headers);
 }
 
 }  // namespace RedHttpClient

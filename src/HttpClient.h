@@ -9,41 +9,41 @@
 #include "HttpMethod.h"
 #include "HttpMultipart.h"
 #include "HttpPair.h"
+#include "HttpPlugin.h"
 #include "HttpResponse.h"
-#include "Settings.h"
 
 namespace RedHttpClient {
 
 class HttpClient : public Red::IScriptable {
- public:
-  static const cpr::SslOptions ssl_options;
-  static Settings settings;
-  static Red::Logger* logger;
-  static Red::PluginHandle handle;
+ private:
+  static HttpPlugin* plugin;
 
+  template <HttpMethod Method, class T>
+  inline static Red::Handle<HttpResponse> send(
+    const Red::CString& p_url, const T& p_body,
+    const Red::Optional<HttpHeaders>& p_headers);
+
+  template <HttpMethod Method>
+  inline static Red::Handle<HttpResponse> send_body(
+    const Red::CString& p_url, const Red::CString& p_body,
+    const Red::Optional<HttpHeaders>& p_headers);
+
+  template <HttpMethod Method>
+  inline static Red::Handle<HttpResponse> send_form(
+    const Red::CString& p_url, const HttpPairs& p_form,
+    const Red::Optional<HttpHeaders>& p_headers);
+
+  template <HttpMethod Method>
+  inline static Red::Handle<HttpResponse> send_multipart(
+    const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
+    const Red::Optional<HttpHeaders>& p_headers);
+
+ public:
   static bool is_secure(const Red::CString& p_url);
   static cpr::Header build_headers(const HttpHeaders& p_headers);
   static HttpHeaders get_headers(const cpr::Response& p_response);
 
-  static void log_request(HttpMethod p_method, const Red::CString& p_url,
-                          const Red::CString& p_body,
-                          const cpr::Header& p_headers);
-  static void log_request_form(HttpMethod p_method, const Red::CString& p_url,
-                               const HttpPairs& p_form,
-                               const cpr::Header& p_headers);
-  static void log_request_multipart(HttpMethod p_method,
-                                    const Red::CString& p_url,
-                                    const Red::Handle<HttpMultipart>& p_form,
-                                    const cpr::Header& p_headers);
-  static void log_response(const cpr::Response& p_response);
-
  public:
-  static void load(const RED4ext::Sdk* p_sdk,
-                   const Red::PluginHandle& p_handle);
-  static void start();
-  static void stop();
-  static void unload();
-
   static Red::Handle<HttpResponse> get(
     const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> post(

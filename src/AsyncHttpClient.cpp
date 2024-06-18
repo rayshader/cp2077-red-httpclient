@@ -1,7 +1,10 @@
 #include "AsyncHttpClient.h"
 #include "HttpClient.h"
+#include "HttpPlugin.h"
 
 namespace RedHttpClient {
+
+HttpPlugin* AsyncHttpClient::plugin = HttpPlugin::get();
 
 void AsyncHttpClient::queue_request(
   const std::shared_future<cpr::Response>& p_future,
@@ -11,7 +14,7 @@ void AsyncHttpClient::queue_request(
   job_queue.Dispatch([p_future, p_callback]() -> void {
     cpr::Response response = p_future.get();
 
-    HttpClient::log_response(response);
+    plugin->log_response(response);
     HttpHeaders headers = HttpClient::get_headers(response);
     auto http_response = Red::MakeHandle<HttpResponse>(response.status_code,
                                                        headers, response.text);
@@ -20,26 +23,24 @@ void AsyncHttpClient::queue_request(
   });
 }
 
-void AsyncHttpClient::get(const HttpCallback& p_callback,
-                          const Red::CString& p_url,
-                          const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
+template <HttpMethod Method, class T>
+void AsyncHttpClient::send(const HttpCallback& p_callback,
+                           const Red::CString& p_url, const T& p_body,
+                           const Red::Optional<HttpHeaders>& p_headers) {
+  if constexpr (std::is_same<T, Red::CString>()) {
+    send_body<Method>(p_callback, p_url, p_body, p_headers);
+  } else if constexpr (std::is_same<T, HttpPairs>()) {
+    send_form<Method>(p_callback, p_url, p_body, p_headers);
+  } else if constexpr (std::is_same<T, Red::Handle<HttpMultipart>>()) {
+    send_multipart<Method>(p_callback, p_url, p_body, p_headers);
   }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request(HttpMethod::GET, p_url, "", request_headers);
-  cpr::AsyncResponse response = cpr::GetAsync(
-    HttpClient::ssl_options, cpr::Url{p_url.c_str()}, request_headers);
-
-  queue_request(response.share(), p_callback);
 }
 
-void AsyncHttpClient::post(const HttpCallback& p_callback,
-                           const Red::CString& p_url,
-                           const Red::CString& p_body,
-                           const Red::Optional<HttpHeaders>& p_headers) {
+template <HttpMethod Method>
+void AsyncHttpClient::send_body(const HttpCallback& p_callback,
+                                const Red::CString& p_url,
+                                const Red::CString& p_body,
+                                const Red::Optional<HttpHeaders>& p_headers) {
   if (!HttpClient::is_secure(p_url)) {
     p_callback({});
     return;
@@ -49,15 +50,32 @@ void AsyncHttpClient::post(const HttpCallback& p_callback,
   if (!request_headers.contains("Content-Type")) {
     request_headers["Content-Type"] = "text/plain";
   }
-  HttpClient::log_request(HttpMethod::POST, p_url, p_body, request_headers);
-  cpr::AsyncResponse response =
-    cpr::PostAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                   cpr::Body{p_body.c_str()}, request_headers);
+  plugin->log_request(Method, p_url, p_body, request_headers);
+  std::shared_future<cpr::Response> future;
 
-  queue_request(response.share(), p_callback);
+  if constexpr (Method == HttpMethod::POST) {
+    future = cpr::PostAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                            cpr::Body{p_body.c_str()}, request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::PUT) {
+    future = cpr::PutAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                           cpr::Body{p_body.c_str()}, request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    future = cpr::PatchAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                             cpr::Body{p_body.c_str()}, request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    future =
+      cpr::DeleteAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                       cpr::Body{p_body.c_str()}, request_headers)
+        .share();
+  }
+  queue_request(future, p_callback);
 }
 
-void AsyncHttpClient::post_form(const HttpCallback& p_callback,
+template <HttpMethod Method>
+void AsyncHttpClient::send_form(const HttpCallback& p_callback,
                                 const Red::CString& p_url,
                                 const HttpPairs& p_form,
                                 const Red::Optional<HttpHeaders>& p_headers) {
@@ -72,16 +90,35 @@ void AsyncHttpClient::post_form(const HttpCallback& p_callback,
   }
   cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
-  HttpClient::log_request_form(HttpMethod::POST, p_url, p_form,
-                               request_headers);
-  cpr::AsyncResponse response =
-    cpr::PostAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                   cpr::Payload{values.begin(), values.end()}, request_headers);
+  plugin->log_request(Method, p_url, p_form, request_headers);
+  std::shared_future<cpr::Response> future;
 
-  queue_request(response.share(), p_callback);
+  if constexpr (Method == HttpMethod::POST) {
+    future = cpr::PostAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                            cpr::Payload{values.begin(), values.end()},
+                            request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::PUT) {
+    future =
+      cpr::PutAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                    cpr::Payload{values.begin(), values.end()}, request_headers)
+        .share();
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    future = cpr::PatchAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                             cpr::Payload{values.begin(), values.end()},
+                             request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    future = cpr::DeleteAsync(
+               plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+               cpr::Payload{values.begin(), values.end()}, request_headers)
+               .share();
+  }
+  queue_request(future, p_callback);
 }
 
-void AsyncHttpClient::post_multipart(
+template <HttpMethod Method>
+void AsyncHttpClient::send_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
@@ -91,17 +128,32 @@ void AsyncHttpClient::post_multipart(
   }
   cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
-  HttpClient::log_request_multipart(HttpMethod::POST, p_url, p_form,
-                                    request_headers);
-  cpr::AsyncResponse response =
-    cpr::PostAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                   p_form->get(), request_headers);
+  plugin->log_request(Method, p_url, p_form, request_headers);
+  std::shared_future<cpr::Response> future;
 
-  queue_request(response.share(), p_callback);
+  if constexpr (Method == HttpMethod::POST) {
+    future = cpr::PostAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                            p_form->get(), request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::PUT) {
+    future = cpr::PutAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                           p_form->get(), request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::PATCH) {
+    future = cpr::PatchAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                             p_form->get(), request_headers)
+               .share();
+  } else if constexpr (Method == HttpMethod::DELETE_) {
+    future =
+      cpr::DeleteAsync(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
+                       p_form->get(), request_headers)
+        .share();
+  }
+  queue_request(future, p_callback);
 }
 
-void AsyncHttpClient::put(const HttpCallback& p_callback,
-                          const Red::CString& p_url, const Red::CString& p_body,
+void AsyncHttpClient::get(const HttpCallback& p_callback,
+                          const Red::CString& p_url,
                           const Red::Optional<HttpHeaders>& p_headers) {
   if (!HttpClient::is_secure(p_url)) {
     p_callback({});
@@ -109,183 +161,94 @@ void AsyncHttpClient::put(const HttpCallback& p_callback,
   }
   cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  HttpClient::log_request(HttpMethod::PUT, p_url, p_body, request_headers);
-  cpr::AsyncResponse response =
-    cpr::PutAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                  cpr::Body{p_body.c_str()}, request_headers);
+  plugin->log_request(HttpMethod::GET, p_url, "", request_headers);
+  cpr::AsyncResponse response = cpr::GetAsync(
+    plugin->get_ssl_options(), cpr::Url{p_url.c_str()}, request_headers);
 
   queue_request(response.share(), p_callback);
+}
+
+void AsyncHttpClient::post(const HttpCallback& p_callback,
+                           const Red::CString& p_url,
+                           const Red::CString& p_body,
+                           const Red::Optional<HttpHeaders>& p_headers) {
+  send<HttpMethod::POST>(p_callback, p_url, p_body, p_headers);
+}
+
+void AsyncHttpClient::post_form(const HttpCallback& p_callback,
+                                const Red::CString& p_url,
+                                const HttpPairs& p_form,
+                                const Red::Optional<HttpHeaders>& p_headers) {
+  send<HttpMethod::POST>(p_callback, p_url, p_form, p_headers);
+}
+
+void AsyncHttpClient::post_multipart(
+  const HttpCallback& p_callback, const Red::CString& p_url,
+  const Red::Handle<HttpMultipart>& p_form,
+  const Red::Optional<HttpHeaders>& p_headers) {
+  send<HttpMethod::POST>(p_callback, p_url, p_form, p_headers);
+}
+
+void AsyncHttpClient::put(const HttpCallback& p_callback,
+                          const Red::CString& p_url, const Red::CString& p_body,
+                          const Red::Optional<HttpHeaders>& p_headers) {
+  send<HttpMethod::PUT>(p_callback, p_url, p_body, p_headers);
 }
 
 void AsyncHttpClient::put_form(const HttpCallback& p_callback,
                                const Red::CString& p_url,
                                const HttpPairs& p_form,
                                const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_form(HttpMethod::PUT, p_url, p_form, request_headers);
-  cpr::AsyncResponse response =
-    cpr::PutAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                  cpr::Payload{values.begin(), values.end()}, request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::PUT>(p_callback, p_url, p_form, p_headers);
 }
 
 void AsyncHttpClient::put_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_multipart(HttpMethod::PUT, p_url, p_form,
-                                    request_headers);
-  cpr::AsyncResponse response =
-    cpr::PutAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                  p_form->get(), request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::PUT>(p_callback, p_url, p_form, p_headers);
 }
 
 void AsyncHttpClient::patch(const HttpCallback& p_callback,
                             const Red::CString& p_url,
                             const Red::CString& p_body,
                             const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  if (!request_headers.contains("Content-Type")) {
-    request_headers["Content-Type"] = "text/plain";
-  }
-  HttpClient::log_request(HttpMethod::PATCH, p_url, p_body, request_headers);
-  cpr::AsyncResponse response =
-    cpr::PatchAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                    cpr::Body{p_body.c_str()}, request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::PATCH>(p_callback, p_url, p_body, p_headers);
 }
 
 void AsyncHttpClient::patch_form(const HttpCallback& p_callback,
                                  const Red::CString& p_url,
                                  const HttpPairs& p_form,
                                  const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_form(HttpMethod::PATCH, p_url, p_form,
-                               request_headers);
-  cpr::AsyncResponse response = cpr::PatchAsync(
-    HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-    cpr::Payload{values.begin(), values.end()}, request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::PATCH>(p_callback, p_url, p_form, p_headers);
 }
 
 void AsyncHttpClient::patch_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_multipart(HttpMethod::PATCH, p_url, p_form,
-                                    request_headers);
-  cpr::AsyncResponse response =
-    cpr::PatchAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                    p_form->get(), request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::PATCH>(p_callback, p_url, p_form, p_headers);
 }
 
 void AsyncHttpClient::delete_(const HttpCallback& p_callback,
                               const Red::CString& p_url,
                               const Red::Optional<Red::CString>& p_body,
                               const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-  Red::CString body = p_body.value;
-
-  HttpClient::log_request(HttpMethod::DELETE_, p_url, body, request_headers);
-  cpr::AsyncResponse response =
-    cpr::DeleteAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                     cpr::Body{body.c_str()}, request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::DELETE_>(p_callback, p_url, p_body.value, p_headers);
 }
 
 void AsyncHttpClient::delete_form(const HttpCallback& p_callback,
                                   const Red::CString& p_url,
                                   const HttpPairs& p_form,
                                   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  std::vector<cpr::Pair> values;
-
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_form(HttpMethod::DELETE_, p_url, p_form,
-                               request_headers);
-  cpr::AsyncResponse response = cpr::DeleteAsync(
-    HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-    cpr::Payload{values.begin(), values.end()}, request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::DELETE_>(p_callback, p_url, p_form, p_headers);
 }
 
 void AsyncHttpClient::delete_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
-
-  HttpClient::log_request_multipart(HttpMethod::DELETE_, p_url, p_form,
-                                    request_headers);
-  cpr::AsyncResponse response =
-    cpr::DeleteAsync(HttpClient::ssl_options, cpr::Url{p_url.c_str()},
-                     p_form->get(), request_headers);
-
-  queue_request(response.share(), p_callback);
+  send<HttpMethod::DELETE_>(p_callback, p_url, p_form, p_headers);
 }
 
 }  // namespace RedHttpClient
