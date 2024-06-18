@@ -40,6 +40,9 @@ template <HttpMethod Method, class T>
 Red::Handle<HttpResponse> HttpClient::send(
   const Red::CString& p_url, const T& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
+  if (!is_secure(p_url)) {
+    return {};
+  }
   if constexpr (std::is_same<T, Red::CString>()) {
     return send_body<Method>(p_url, p_body, p_headers);
   } else if constexpr (std::is_same<T, HttpPairs>()) {
@@ -54,9 +57,6 @@ template <HttpMethod Method>
 Red::Handle<HttpResponse> HttpClient::send_body(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
   cpr::Header request_headers = build_headers(p_headers.value);
 
   if (!request_headers.contains("Content-Type")) {
@@ -89,9 +89,6 @@ template <HttpMethod Method>
 Red::Handle<HttpResponse> HttpClient::send_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
   std::vector<cpr::Pair> values;
 
   for (const auto& pair : p_form) {
@@ -130,9 +127,6 @@ template <HttpMethod Method>
 Red::Handle<HttpResponse> HttpClient::send_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!is_secure(p_url)) {
-    return {};
-  }
   cpr::Header request_headers = build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);

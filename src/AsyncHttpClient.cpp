@@ -27,6 +27,10 @@ template <HttpMethod Method, class T>
 void AsyncHttpClient::send(const HttpCallback& p_callback,
                            const Red::CString& p_url, const T& p_body,
                            const Red::Optional<HttpHeaders>& p_headers) {
+  if (!HttpClient::is_secure(p_url)) {
+    p_callback({});
+    return;
+  }
   if constexpr (std::is_same<T, Red::CString>()) {
     send_body<Method>(p_callback, p_url, p_body, p_headers);
   } else if constexpr (std::is_same<T, HttpPairs>()) {
@@ -41,10 +45,6 @@ void AsyncHttpClient::send_body(const HttpCallback& p_callback,
                                 const Red::CString& p_url,
                                 const Red::CString& p_body,
                                 const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
   cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
   if (!request_headers.contains("Content-Type")) {
@@ -79,10 +79,6 @@ void AsyncHttpClient::send_form(const HttpCallback& p_callback,
                                 const Red::CString& p_url,
                                 const HttpPairs& p_form,
                                 const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
   std::vector<cpr::Pair> values;
 
   for (const auto& pair : p_form) {
@@ -122,10 +118,6 @@ void AsyncHttpClient::send_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  if (!HttpClient::is_secure(p_url)) {
-    p_callback({});
-    return;
-  }
   cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);
