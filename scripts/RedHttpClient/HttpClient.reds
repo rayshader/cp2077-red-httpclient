@@ -1,3 +1,8 @@
+module RedHttpClient
+
+@if(ModuleExists("RedData.Json"))
+import RedData.Json.*
+
 public native class HttpClient {
 
   public static native func Get(url: String, opt headers: array<HttpHeader>) -> ref<HttpResponse>;

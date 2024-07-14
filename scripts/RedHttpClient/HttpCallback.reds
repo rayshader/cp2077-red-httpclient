@@ -1,3 +1,5 @@
+module RedHttpClient
+
 public native struct HttpCallback {
 
   public static func Create(target: wref<IScriptable>, function: CName, opt data: array<Variant>) -> HttpCallback {

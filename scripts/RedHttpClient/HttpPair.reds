@@ -1,3 +1,5 @@
+module RedHttpClient
+
 public native struct HttpPair {
 
   public static func Create(key: String, value: String) -> HttpPair {

@@ -1,0 +1,15 @@
+{
+  "name": "RedHttpClient",
+  "version": "0.3.3",
+  "license": true,
+  "dist": "dist\\",
+  "scripts": {
+    "redscript": {
+      "src": "scripts\\RedHttpClient\\"
+    }
+  },
+  "plugin": {
+    "debug": "build\\Debug\\",
+    "release": "build\\Release\\"
+  }
+}

@@ -1,3 +1,8 @@
+module RedHttpClient
+
+@if(ModuleExists("RedData.Json"))
+import RedData.Json.*
+
 public native class HttpResponse {
 
   public native func GetStatus() -> HttpStatus;

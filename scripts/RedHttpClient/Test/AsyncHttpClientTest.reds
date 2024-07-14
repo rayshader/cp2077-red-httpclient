@@ -1,3 +1,5 @@
+module RedHttpClient.Test
+
 import RedData.Json.*
 import RedHttpClient.*
 

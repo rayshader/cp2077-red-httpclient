@@ -1,3 +1,8 @@
+module RedHttpClient
+
+@if(ModuleExists("RedData.Json"))
+import RedData.Json.*
+
 public native class AsyncHttpClient {
 
   public static native func Get(callback: HttpCallback, url: String, opt headers: array<HttpHeader>) -> Void;

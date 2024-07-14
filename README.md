@@ -16,8 +16,8 @@ CET.
 ## Installation
 1. Install requirements:
   - [RED4ext] v1.24.3+
-  - [RedData] v0.4.0+
-  - [RedFileSystem] v0.9.0+ is recommended
+  - [RedData] v0.4.0+ (only required for Json data)
+  - [RedFileSystem] v0.9.0+ (recommended)
 2. Extract the [latest archive] into the Cyberpunk 2077 directory.
 
 ## Usage

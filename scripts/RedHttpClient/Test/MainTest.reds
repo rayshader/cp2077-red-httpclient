@@ -1,6 +1,9 @@
-import Codeware.*
+module RedHttpClient.Test
 
-public class MainTest extends ScriptableEnv {
+import Codeware.*
+import RedHttpClient.*
+
+public class RedHttpClientTest extends ScriptableEnv {
   private let m_runner: ref<RedTest>;
 
   /// Lifecycle ///
@@ -15,6 +18,6 @@ public class MainTest extends ScriptableEnv {
 
 }
 
-public static func GetMainTest() -> ref<MainTest> {
-  return ScriptableEnv.Get(n"MainTest") as MainTest;
+public static func GetRedHttpClientTest() -> ref<RedHttpClientTest> {
+  return ScriptableEnv.Get(n"RedHttpClientTest") as RedHttpClientTest;
 }

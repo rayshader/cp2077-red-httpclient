@@ -1,3 +1,5 @@
+module RedHttpClient
+
 public native struct HttpHeader {
 
   public static func Create(name: String, value: String) -> HttpHeader {

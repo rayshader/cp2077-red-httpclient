@@ -1,3 +1,5 @@
+module RedHttpClient
+
 public native class HttpMultipart {
 
   public native func AddPart(name: String, value: String) -> Void;
