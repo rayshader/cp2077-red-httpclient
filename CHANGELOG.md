@@ -5,11 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+------------------------
+
+## [0.3.4] - 2024-07-14
 ### Fixed
-- `RedData.Json` is now optional when installing `RedHttpClient`. 
+- `RedData.Json` is now optional when installing `RedHttpClient`.
 
 ### Added
-- support in `HttpClient` and `AsyncHttpClient` to send a body with `DELETE` 
+- support in `HttpClient` and `AsyncHttpClient` to send a body with `DELETE`
   methods.
 
 ------------------------
@@ -58,7 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AsyncHttpClient to asynchronously send HTTP requests (callback mode).
 
 <!-- Table of releases -->
-[Unreleased]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.0...v0.3.1
