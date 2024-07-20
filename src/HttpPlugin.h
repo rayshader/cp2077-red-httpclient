@@ -15,8 +15,6 @@ namespace RedHttpClient {
 
 class HttpPlugin {
  private:
-  static HttpPlugin singleton;
-
   Red::PluginHandle handle;
   Red::Logger* logger;
 

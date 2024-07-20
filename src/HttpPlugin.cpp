@@ -1,7 +1,6 @@
 #include "HttpPlugin.h"
 
 namespace RedHttpClient {
-HttpPlugin HttpPlugin::singleton;
 
 HttpPlugin::HttpPlugin()
     : logger(nullptr),
@@ -9,6 +8,8 @@ HttpPlugin::HttpPlugin()
       ssl_options(cpr::Ssl(cpr::ssl::TLSv1_2{})) {}
 
 HttpPlugin* HttpPlugin::get() {
+  static HttpPlugin singleton;
+
   return &singleton;
 }
 
