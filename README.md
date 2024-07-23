@@ -263,8 +263,7 @@ Contributions are welcome, feel free to fill an issue or a PR.
 1. Install requirements:
   - CMake v3.27+
   - Visual Studio Community 2022+
-  - Node JS v20.11+
-    - run `npm install --save-dev archiver`
+  - [red-cli] v0.2.0+
 2. Configure project with:
 ```shell
 cmake -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIBS:BOOL=OFF -S . -B build
@@ -278,16 +277,12 @@ cmake -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIBS:BOOL=OFF -S . -B bui
 cmake --build build --target RedHttpClient --config Debug
 ```
 
-## Tests
-1. Install in your game directory:
+It will execute `red-cli install` for you using a CMake custom command.
 
-```shell
-node install.mjs
-```
- 
-2. Run game.
-3. Open CET, show Game Log popup.
-4. Output should show tests result.
+## Tests
+1. Run game.
+2. Open CET, show Game Log popup.
+3. Output should show tests result.
 
 ## Release
 1. Build in release mode:
@@ -296,11 +291,9 @@ node install.mjs
 cmake --build build --target RedHttpClient --config Release
 ```
 
-2. Bundle release:
-
-```shell
-node bundle.mjs
-```
+It will execute `red-cli pack` for you using a CMake custom command. You should
+find an archive `RedHttpClient-vX.Y.Z.zip` in the root directory, ready to 
+release.
 
 <!-- Table of links -->
 [RED4ext]: https://github.com/WopsS/RED4ext
@@ -312,3 +305,4 @@ node bundle.mjs
 [RedFileSystem]: https://github.com/rayshader/cp2077-red-filesystem
 [examples/]: https://github.com/rayshader/cp2077-red-httpclient/tree/master/examples
 [Redscript Wiki]: https://wiki.redmodding.org/redscript/language/patterns#heterogeneous-array-literals
+[red-cli]: https://github.com/rayshader/cp2077-red-cli/releases/latest
