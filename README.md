@@ -1,5 +1,5 @@
 # Red Http Client
-![Cyberpunk 2077](https://img.shields.io/badge/Cyberpunk%202077-v2.12a-blue)
+![Cyberpunk 2077](https://img.shields.io/badge/Cyberpunk%202077-v2.13-blue)
 ![GitHub License](https://img.shields.io/github/license/rayshader/cp2077-red-httpclient)
 [![Donate](https://img.shields.io/badge/donate-buy%20me%20a%20coffee-yellow)](https://www.buymeacoffee.com/lpfreelance)
 
@@ -9,15 +9,15 @@ CET.
 # Getting started
 
 ## Compatibility
-- Cyberpunk 2077 v2.12a
-- [Redscript] 0.5.25+
-- [Cyber Engine Tweaks] 1.32.2+
+- Cyberpunk 2077 v2.13
+- [Redscript] 0.5.27+
+- [Cyber Engine Tweaks] 1.33.0+
 
 ## Installation
 1. Install requirements:
-  - [RED4ext] v1.25.0+
-  - [RedData] v0.4.0+ (only required for Json data)
-  - [RedFileSystem] v0.9.0+ (recommended)
+  - [RED4ext] v1.25.1+
+  - [RedData] v0.5.0+ (only required for Json data)
+  - [RedFileSystem] v0.10.0+ (recommended)
 2. Extract the [latest archive] into the Cyberpunk 2077 directory.
 
 ## Usage
@@ -263,7 +263,7 @@ Contributions are welcome, feel free to fill an issue or a PR.
 1. Install requirements:
   - CMake v3.27+
   - Visual Studio Community 2022+
-  - [red-cli] v0.2.0+
+  - [red-cli] v0.2.2+
 2. Configure project with:
 ```shell
 cmake -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIBS:BOOL=OFF -S . -B build
