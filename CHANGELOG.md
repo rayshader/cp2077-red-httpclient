@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ------------------------
 
+## [0.5.0] - 2024-12-11
+### Changed
+- support patch 2.2
+- bump libcpr to 1.11.1 (was 1.10.5)
+
+------------------------
+
 ## [0.4.0] - 2024-09-13
 ### Changed
 - support patch 2.13
@@ -68,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AsyncHttpClient to asynchronously send HTTP requests (callback mode).
 
 <!-- Table of releases -->
-[Unreleased]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.4...v0.4.0
 [0.3.4]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/rayshader/cp2077-red-httpclient/compare/v0.3.2...v0.3.3
