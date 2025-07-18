@@ -63,7 +63,7 @@ set_target_properties(RedLib PROPERTIES FOLDER "Dependencies")
 include(FetchContent)
 FetchContent_Declare(cpr
         GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG dec9422db3af470641f8b0d90e4b451c4daebf64)
+        GIT_TAG da40186618909b1a7363d4e4495aa899c6e0eb75)
 FetchContent_MakeAvailable(cpr)
 ##
 
