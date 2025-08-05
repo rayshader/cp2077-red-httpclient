@@ -1,6 +1,6 @@
 module RedHttpClient
 
-enum HttpStatus {
+public enum HttpStatus {
   Continue = 100,
   SwitchingProtocols = 101,
   Processing = 102,
