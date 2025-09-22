@@ -12,7 +12,6 @@
 namespace RedHttpClient {
 
 class HttpResponse : public Red::IScriptable {
- private:
   int32_t status_code = -1;
   Red::DynArray<HttpHeader> headers;
   Red::CString body;
@@ -20,7 +19,7 @@ class HttpResponse : public Red::IScriptable {
  public:
   HttpResponse() = default;
 
-  explicit HttpResponse(int32_t p_status_code,
+  explicit HttpResponse(const int32_t p_status_code,
                         Red::DynArray<HttpHeader> p_headers,
                         Red::CString p_body)
       : status_code(p_status_code),
@@ -38,8 +37,8 @@ class HttpResponse : public Red::IScriptable {
   }
 
   [[nodiscard]] bool has_header(const Red::CString& p_header) const {
-    for (const auto& header : headers) {
-      if (header.name == p_header) {
+    for (const auto& [header, _] : headers) {
+      if (header == p_header) {
         return true;
       }
     }
@@ -47,15 +46,17 @@ class HttpResponse : public Red::IScriptable {
   }
 
   [[nodiscard]] Red::CString get_header(const Red::CString& p_header) const {
-    for (const auto& header : headers) {
-      if (header.name == p_header) {
-        return header.value;
+    for (const auto& [header, value] : headers) {
+      if (header == p_header) {
+        return value;
       }
     }
     return {};
   }
 
-  [[nodiscard]] Red::CString get_text() const { return body; }
+  [[nodiscard]] Red::CString get_text() const {
+    return body;
+  }
 
   RTTI_IMPL_TYPEINFO(RedHttpClient::HttpResponse);
   RTTI_IMPL_ALLOCATOR();

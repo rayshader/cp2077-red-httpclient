@@ -10,13 +10,14 @@
 namespace RedHttpClient {
 
 class HttpMultipart : public Red::IScriptable {
- private:
   cpr::Multipart multipart;
 
  public:
   HttpMultipart() : multipart({}) {}
 
-  [[nodiscard]] cpr::Multipart get() const { return multipart; }
+  [[nodiscard]] cpr::Multipart get() const {
+    return multipart;
+  }
 
   void add_part(const Red::CString& p_name, const Red::CString& p_value) {
     multipart.parts.emplace_back(p_name.c_str(), p_value.c_str());

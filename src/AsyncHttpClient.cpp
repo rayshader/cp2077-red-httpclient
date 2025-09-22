@@ -16,7 +16,7 @@ void AsyncHttpClient::queue_request(
 
     plugin->log_response(response);
     HttpHeaders headers = HttpClient::get_headers(response);
-    auto http_response = Red::MakeHandle<HttpResponse>(response.status_code,
+    const auto http_response = Red::MakeHandle<HttpResponse>(response.status_code,
                                                        headers, response.text);
 
     p_callback(http_response);
@@ -81,10 +81,10 @@ void AsyncHttpClient::send_form(const HttpCallback& p_callback,
                                 const Red::Optional<HttpHeaders>& p_headers) {
   std::vector<cpr::Pair> values;
 
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
+  for (const auto& [key, value] : p_form) {
+    values.emplace_back(key.c_str(), value.c_str());
   }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);
   std::shared_future<cpr::Response> future;
@@ -118,7 +118,7 @@ void AsyncHttpClient::send_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);
   std::shared_future<cpr::Response> future;
@@ -151,7 +151,7 @@ void AsyncHttpClient::get(const HttpCallback& p_callback,
     p_callback({});
     return;
   }
-  cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(HttpMethod::GET, p_url, "", request_headers);
   cpr::AsyncResponse response = cpr::GetAsync(

@@ -14,7 +14,6 @@
 namespace RedHttpClient {
 
 class AsyncHttpClient : public Red::IScriptable {
- private:
   static HttpPlugin* plugin;
 
   inline static void queue_request(
@@ -22,24 +21,24 @@ class AsyncHttpClient : public Red::IScriptable {
     const HttpCallback& p_callback);
 
   template <HttpMethod Method, class T>
-  inline static void send(const HttpCallback& p_callback,
-                          const Red::CString& p_url, const T& p_body,
-                          const Red::Optional<HttpHeaders>& p_headers);
+  static void send(const HttpCallback& p_callback,
+                   const Red::CString& p_url, const T& p_body,
+                   const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static void send_body(const HttpCallback& p_callback,
-                               const Red::CString& p_url,
-                               const Red::CString& p_body,
-                               const Red::Optional<HttpHeaders>& p_headers);
+  static void send_body(const HttpCallback& p_callback,
+                        const Red::CString& p_url,
+                        const Red::CString& p_body,
+                        const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static void send_form(const HttpCallback& p_callback,
-                               const Red::CString& p_url,
-                               const HttpPairs& p_form,
-                               const Red::Optional<HttpHeaders>& p_headers);
+  static void send_form(const HttpCallback& p_callback,
+                        const Red::CString& p_url,
+                        const HttpPairs& p_form,
+                        const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static void send_multipart(
+  static void send_multipart(
     const HttpCallback& p_callback, const Red::CString& p_url,
     const Red::Handle<HttpMultipart>& p_form,
     const Red::Optional<HttpHeaders>& p_headers);

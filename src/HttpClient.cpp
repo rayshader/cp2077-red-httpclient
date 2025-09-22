@@ -12,17 +12,16 @@ namespace RedHttpClient {
 HttpPlugin* HttpClient::plugin = HttpPlugin::get();
 
 bool HttpClient::is_secure(const Red::CString& p_url) {
-  std::string url(p_url.c_str());
+  const std::string url(p_url.c_str());
 
   return url.starts_with("https://");
 }
 
-cpr::Header HttpClient::build_headers(
-  const RedHttpClient::HttpHeaders& p_headers) {
+cpr::Header HttpClient::build_headers(const HttpHeaders& p_headers) {
   cpr::Header headers;
 
-  for (const auto& header : p_headers) {
-    headers.emplace(header.name.c_str(), header.value.c_str());
+  for (const auto& [header, value] : p_headers) {
+    headers.emplace(header.c_str(), value.c_str());
   }
   return headers;
 }
@@ -30,8 +29,8 @@ cpr::Header HttpClient::build_headers(
 HttpHeaders HttpClient::get_headers(const cpr::Response& p_response) {
   HttpHeaders headers;
 
-  for (const auto& header : p_response.header) {
-    headers.EmplaceBack(header.first, header.second);
+  for (const auto& [header, value] : p_response.header) {
+    headers.EmplaceBack(header, value);
   }
   return headers;
 }
@@ -91,8 +90,8 @@ Red::Handle<HttpResponse> HttpClient::send_form(
   const Red::Optional<HttpHeaders>& p_headers) {
   std::vector<cpr::Pair> values;
 
-  for (const auto& pair : p_form) {
-    values.emplace_back(pair.key.c_str(), pair.value.c_str());
+  for (const auto& [key, value] : p_form) {
+    values.emplace_back(key.c_str(), value.c_str());
   }
   cpr::Header request_headers = build_headers(p_headers.value);
 

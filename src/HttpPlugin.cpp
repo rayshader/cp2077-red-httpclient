@@ -3,8 +3,8 @@
 namespace RedHttpClient {
 
 HttpPlugin::HttpPlugin()
-    : logger(nullptr),
-      handle(nullptr),
+    : handle(nullptr),
+      logger(nullptr),
       ssl_options(cpr::Ssl(cpr::ssl::TLSv1_2{})) {}
 
 HttpPlugin* HttpPlugin::get() {
@@ -14,25 +14,26 @@ HttpPlugin* HttpPlugin::get() {
 }
 
 void HttpPlugin::load(const RED4ext::Sdk* p_sdk,
-                      RED4ext::PluginHandle p_handle) {
+                      const RED4ext::PluginHandle p_handle) {
   logger = p_sdk->logger;
   handle = p_handle;
-  Red::GameState init;
 
-  init.OnEnter = [](Red::CGameApplication* p_app) -> bool {
-    HttpPlugin::get()->start();
+  Red::GameState init;
+  init.OnEnter = [](Red::CGameApplication*) -> bool {
+    get()->start();
     return true;
   };
   init.OnUpdate = nullptr;
   init.OnExit = nullptr;
-  Red::GameState shutdown;
 
-  shutdown.OnEnter = [](Red::CGameApplication* p_app) -> bool {
-    HttpPlugin::get()->stop();
+  Red::GameState shutdown;
+  shutdown.OnEnter = [](Red::CGameApplication*) -> bool {
+    get()->stop();
     return true;
   };
   shutdown.OnUpdate = nullptr;
   shutdown.OnExit = nullptr;
+
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Initialization, &init);
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Shutdown, &shutdown);
 }
@@ -54,7 +55,7 @@ cpr::SslOptions HttpPlugin::get_ssl_options() const {
   return ssl_options;
 }
 
-std::string HttpPlugin::log_http_method(HttpMethod p_method) {
+std::string HttpPlugin::log_http_method(const HttpMethod p_method) {
   switch (p_method) {
     case HttpMethod::GET:
       return "GET";
@@ -71,7 +72,7 @@ std::string HttpPlugin::log_http_method(HttpMethod p_method) {
   }
 }
 
-void HttpPlugin::log_response(const cpr::Response& p_response) {
+void HttpPlugin::log_response(const cpr::Response& p_response) const {
   if (logger == nullptr || handle == nullptr || !settings.can_log()) {
     return;
   }
@@ -79,9 +80,9 @@ void HttpPlugin::log_response(const cpr::Response& p_response) {
   logger->Info(handle, std::format("HTTP/1.1 {} {}", p_response.status_code,
                                    p_response.reason)
                          .c_str());
-  for (const auto& header : p_response.header) {
+  for (const auto& [header, value] : p_response.header) {
     logger->Info(handle,
-                 std::format("{}: {}", header.first, header.second).c_str());
+                 std::format("{}: {}", header, value).c_str());
   }
   if (!p_response.text.empty()) {
     logger->Info(handle, "");

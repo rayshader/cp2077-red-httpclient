@@ -14,7 +14,6 @@
 namespace RedHttpClient {
 
 class HttpPlugin {
- private:
   Red::PluginHandle handle;
   Red::Logger* logger;
 
@@ -37,10 +36,10 @@ class HttpPlugin {
 
   [[nodiscard]] cpr::SslOptions get_ssl_options() const;
 
-  void log_response(const cpr::Response& p_response);
+  void log_response(const cpr::Response& p_response) const;
 
   template <class T>
-  void log_request(HttpMethod p_method, const Red::CString& p_url,
+  void log_request(const HttpMethod p_method, const Red::CString& p_url,
                    const T& p_body, const cpr::Header& p_headers) {
     if (logger == nullptr || handle == nullptr || !settings.can_log()) {
       return;
@@ -49,9 +48,9 @@ class HttpPlugin {
 
     logger->Info(handle, "HTTP request:");
     logger->Info(handle, std::format("{} {}", method, p_url.c_str()).c_str());
-    for (const auto& header : p_headers) {
+    for (const auto& [header, value] : p_headers) {
       logger->Info(handle,
-                   std::format("{}: {}", header.first, header.second).c_str());
+                   std::format("{}: {}", header, value).c_str());
     }
     std::string body;
 
@@ -69,7 +68,7 @@ class HttpPlugin {
         }
       }
     } else if constexpr (std::is_same<T, Red::Handle<HttpMultipart>>()) {
-      cpr::Multipart multipart = p_body->get();
+      const cpr::Multipart multipart = p_body->get();
       const std::string boundary = "-----------------------------52414e444f4d";
 
       for (const auto& part : multipart.parts) {

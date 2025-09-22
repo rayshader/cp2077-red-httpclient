@@ -15,26 +15,25 @@
 namespace RedHttpClient {
 
 class HttpClient : public Red::IScriptable {
- private:
   static HttpPlugin* plugin;
 
   template <HttpMethod Method, class T>
-  inline static Red::Handle<HttpResponse> send(
+  static Red::Handle<HttpResponse> send(
     const Red::CString& p_url, const T& p_body,
     const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static Red::Handle<HttpResponse> send_body(
+  static Red::Handle<HttpResponse> send_body(
     const Red::CString& p_url, const Red::CString& p_body,
     const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static Red::Handle<HttpResponse> send_form(
+  static Red::Handle<HttpResponse> send_form(
     const Red::CString& p_url, const HttpPairs& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
 
   template <HttpMethod Method>
-  inline static Red::Handle<HttpResponse> send_multipart(
+  static Red::Handle<HttpResponse> send_multipart(
     const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
     const Red::Optional<HttpHeaders>& p_headers);
 
@@ -43,7 +42,6 @@ class HttpClient : public Red::IScriptable {
   static cpr::Header build_headers(const HttpHeaders& p_headers);
   static HttpHeaders get_headers(const cpr::Response& p_response);
 
- public:
   static Red::Handle<HttpResponse> get(
     const Red::CString& p_url, const Red::Optional<HttpHeaders>& p_headers);
   static Red::Handle<HttpResponse> post(

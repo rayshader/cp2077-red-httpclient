@@ -4,33 +4,32 @@
 #include <RED4ext/RED4ext.hpp>
 #include <RedData.hpp>
 #include <RedFileSystem.hpp>
-#include <RedLib.hpp>
 #include <sstream>
 
 namespace RedHttpClient {
 
 class Settings {
- private:
   RedFileSystem::FileSystemStorage storage;
   RedFileSystem::File config;
 
   bool logging;
 
- private:
   void load_config() {
     if (!RedFileSystem::IsDetected() || !RedData::IsDetected()) {
       return;
     }
+
     storage = RedFileSystem::FileSystem::GetStorage("RedHttpClient");
     if (!storage) {
       return;
     }
-    RedFileSystem::FileSystemStatus status = storage.Exists("config.json");
 
+    RedFileSystem::FileSystemStatus status = storage.Exists("config.json");
     config = storage.GetFile("config.json");
     if (!config) {
       return;
     }
+
     if (status != RedFileSystem::FileSystemStatus::True) {
       create_config();
     } else {
@@ -40,24 +39,22 @@ class Settings {
 
   void create_config() {
     std::stringstream stream;
-
     stream << "{"
               "\"version\": \"0.2.0\","
               "\"logging\": " << std::boolalpha << logging
            << "}";
-    auto json = RedData::Json::ParseJson(stream.str());
 
+    const auto json = RedData::Json::ParseJson(stream.str());
     config.WriteJson(json, "  ");
   }
 
   void read_config() {
-    auto json = config.ReadAsJson();
-
+    const auto json = config.ReadAsJson();
     if (!json.IsObject()) {
       return;
     }
-    RedData::Json::JsonObject conf = json.GetHandle();
 
+    const RedData::Json::JsonObject conf = json.GetHandle();
     logging = conf.GetKeyBool("logging");
   }
 
@@ -66,7 +63,9 @@ class Settings {
 
   [[nodiscard]] bool can_log() const { return logging; }
 
-  void load() { load_config(); }
+  void load() {
+    load_config();
+  }
 
   void unload() {
     storage = {};
