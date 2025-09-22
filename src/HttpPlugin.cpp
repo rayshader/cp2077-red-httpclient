@@ -1,11 +1,16 @@
 #include "HttpPlugin.h"
 
+#include <windows.h>
+#include <shellapi.h>
+
 namespace RedHttpClient {
 
 HttpPlugin::HttpPlugin()
     : handle(nullptr),
       logger(nullptr),
-      ssl_options(cpr::Ssl(cpr::ssl::TLSv1_2{})) {}
+      ssl_options(cpr::Ssl(cpr::ssl::TLSv1_2{})),
+      m_has_tls(true),
+      m_has_self_signed(false) {}
 
 HttpPlugin* HttpPlugin::get() {
   static HttpPlugin singleton;
@@ -36,6 +41,34 @@ void HttpPlugin::load(const RED4ext::Sdk* p_sdk,
 
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Initialization, &init);
   p_sdk->gameStates->Add(p_handle, Red::EGameStateType::Shutdown, &shutdown);
+
+  const LPWSTR command = GetCommandLineW();
+  int argc;
+  LPWSTR* argv = CommandLineToArgvW(command, &argc);
+  for (int i = 0; i < argc; i++) {
+    const std::wstring arg{argv[i]};
+    if (arg == L"-no-tls") {
+      m_has_tls = false;
+    } else if (arg == L"-self-signed") {
+      m_has_self_signed = true;
+    }
+  }
+  LocalFree(argv);
+
+  if (!m_has_tls) {
+    logger->Warn(handle, "TLS is disabled. "
+                         "This feature is only meant for local development.");
+  }
+
+  if (m_has_self_signed) {
+    ssl_options = cpr::Ssl(cpr::ssl::TLSv1_2{},
+      cpr::ssl::VerifyHost{false},
+      cpr::ssl::VerifyPeer{false},
+      cpr::ssl::VerifyStatus{false});
+
+    logger->Warn(handle, "Self-signed certificates are allowed. "
+                         "This feature is only meant for local development.");
+  }
 }
 
 void HttpPlugin::unload() {
@@ -53,6 +86,14 @@ void HttpPlugin::stop() {
 
 cpr::SslOptions HttpPlugin::get_ssl_options() const {
   return ssl_options;
+}
+
+bool HttpPlugin::has_tls() const {
+  return m_has_tls;
+}
+
+bool HttpPlugin::has_self_signed() const {
+  return m_has_self_signed;
 }
 
 std::string HttpPlugin::log_http_method(const HttpMethod p_method) {

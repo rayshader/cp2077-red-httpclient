@@ -256,6 +256,21 @@ DeleteMultipart(callback: HttpCallback, url: String, form: ref<HttpMultipart>, o
 DeleteJson(callback: HttpCallback, url: String, body: ref<JsonVariant>, opt headers: array<HttpHeader>) -> Void;
 ```
 
+### Local development
+
+You can run the game with the following arguments to test with a local server
+of yours.
+
+`-no-tls` to disable TLS, and the URL must starts with:
+- `http://127.0.0.1`
+- `http://192.168.0.`
+- `http://localhost`
+
+`-self-signed` to allow self-signed certificates, and the URL must starts with:
+- `https://127.0.0.1`
+- `https://192.168.0.`
+- `https://localhost`
+
 # Development
 Contributions are welcome, feel free to fill an issue or a PR.
 

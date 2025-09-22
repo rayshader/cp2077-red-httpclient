@@ -14,6 +14,18 @@ HttpPlugin* HttpClient::plugin = HttpPlugin::get();
 bool HttpClient::is_secure(const Red::CString& p_url) {
   const std::string url(p_url.c_str());
 
+  if (plugin->has_self_signed()) {
+    return url.starts_with("https://127.0.0.1") ||
+           url.starts_with("https://192.168.0.") ||
+           url.starts_with("https://localhost");
+  }
+
+  if (!plugin->has_tls()) {
+    return url.starts_with("http://127.0.0.1") ||
+           url.starts_with("http://192.168.0.") ||
+           url.starts_with("http://localhost");
+  }
+
   return url.starts_with("https://");
 }
 

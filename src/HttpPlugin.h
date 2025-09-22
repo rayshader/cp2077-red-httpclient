@@ -17,9 +17,11 @@ class HttpPlugin {
   Red::PluginHandle handle;
   Red::Logger* logger;
 
-  const cpr::SslOptions ssl_options;
+  cpr::SslOptions ssl_options;
 
   Settings settings;
+  bool m_has_tls;
+  bool m_has_self_signed;
 
   static std::string log_http_method(HttpMethod p_method);
 
@@ -35,6 +37,8 @@ class HttpPlugin {
   void stop();
 
   [[nodiscard]] cpr::SslOptions get_ssl_options() const;
+  [[nodiscard]] bool has_tls() const;
+  [[nodiscard]] bool has_self_signed() const;
 
   void log_response(const cpr::Response& p_response) const;
 
