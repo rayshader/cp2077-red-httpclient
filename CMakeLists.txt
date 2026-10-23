@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(RedHttpClient VERSION 0.7.2)
+project(RedHttpClient VERSION 0.8.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
@@ -59,7 +59,7 @@ add_subdirectory(deps/RedLib)
 set_target_properties(RedLib PROPERTIES FOLDER "Dependencies")
 ##
 
-## Library cpr 1.14.2
+## Library cpr 1.15.1
 include(FetchContent)
 
 set(CPR_ENABLE_SSL ON CACHE BOOL "" FORCE)
@@ -67,7 +67,7 @@ set(CPR_ENABLE_SSL ON CACHE BOOL "" FORCE)
 set(CPR_CURL_USE_LIBPSL OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(cpr
         GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG 1.14.2
+        GIT_TAG 1.15.1
         GIT_SHALLOW ON)
 FetchContent_MakeAvailable(cpr)
 ##
