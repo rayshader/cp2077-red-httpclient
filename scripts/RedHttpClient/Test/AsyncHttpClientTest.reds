@@ -69,7 +69,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -96,7 +96,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST FORM -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -123,7 +123,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST MULTIPART -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -148,7 +148,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("POST JSON -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -190,7 +190,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PUT -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -217,7 +217,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PUT FORM -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -244,7 +244,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PUT MULTIPART -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -269,7 +269,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PUT JSON -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -311,7 +311,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PATCH -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -338,7 +338,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PATCH FORM -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -365,7 +365,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PATCH MULTIPART -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -390,7 +390,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("PATCH JSON -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -432,7 +432,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("DELETE -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -459,7 +459,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("DELETE FORM -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -486,7 +486,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("DELETE MULTIPART -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }
@@ -511,7 +511,7 @@ public class AsyncHttpClientTest extends BaseTest {
     let json = response.GetJson() as JsonObject;
 
     if !this.ExpectBool("DELETE JSON -> application/json", IsDefined(json), true) {
-      LogChannel(n"Error", "Response Json format invalid");
+      FTLogError("Response Json format invalid");
       done.Call();
       return;
     }

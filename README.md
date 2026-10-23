@@ -10,12 +10,12 @@ CET.
 
 ## Compatibility
 - Cyberpunk 2077 v2.31
-- [Redscript] 0.5.27+
-- [Cyber Engine Tweaks] 1.36.0+
+- [Redscript] 0.5.31+
+- [Cyber Engine Tweaks] 1.37.0+
 
 ## Installation
 1. Install requirements:
-  - [RED4ext] v1.29.0+
+  - [RED4ext] v1.30.0+
   - [RedData] v0.9.0+ (only required for Json data)
   - [RedFileSystem] v0.15.0+ (recommended)
 2. Extract the [latest archive] into the Cyberpunk 2077 directory.
@@ -60,13 +60,13 @@ you're using `HttpClient` or `AsyncHttpClient` (see after).
 // Hello world!
 let response: ref<HttpResponse>;
 
-LogChannel(n"Info", s"Status: \(response.GetStatus())");
-LogChannel(n"Info", s"Status code: \(response.GetStatusCode())");
-LogChannel(n"Info", s"Headers: \(ArraySize(response.GetHeaders()))");
-LogChannel(n"Info", s"  Content-Type: \(response.HasHeader("Content-Type"))");
-LogChannel(n"Info", s"  Content-Type: '\(response.GetHeader("Content-Type"))'");
-LogChannel(n"Info", s"Text: '\(response.GetText())'");
-LogChannel(n"Info", s"Is Json: \(IsDefined(response.GetJson()))");
+FTLog(s"Status: \(response.GetStatus())");
+FTLog(s"Status code: \(response.GetStatusCode())");
+FTLog(s"Headers: \(ArraySize(response.GetHeaders()))");
+FTLog(s"  Content-Type: \(response.HasHeader("Content-Type"))");
+FTLog(s"  Content-Type: '\(response.GetHeader("Content-Type"))'");
+FTLog(s"Text: '\(response.GetText())'");
+FTLog(s"Is Json: \(IsDefined(response.GetJson()))");
 
 // It should log the following:
 // Status: OK
@@ -278,7 +278,7 @@ Contributions are welcome, feel free to fill an issue or a PR.
 1. Install requirements:
   - CMake v3.27+
   - Visual Studio Community 2022+
-  - [red-cli] v0.2.2+
+  - [red-cli] v0.4.0+
 2. Configure project with:
 ```shell
 cmake -G "Visual Studio 17 2022" -A x64 -DBUILD_SHARED_LIBS:BOOL=OFF -S . -B build

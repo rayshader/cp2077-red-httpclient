@@ -18,12 +18,12 @@ HttpPlugin* HttpPlugin::get() {
   return &singleton;
 }
 
-void HttpPlugin::load(const RED4ext::Sdk* p_sdk,
-                      const RED4ext::PluginHandle p_handle) {
+void HttpPlugin::load(const RED4ext::v1::Sdk* p_sdk,
+                      const RED4ext::v1::PluginHandle p_handle) {
   logger = p_sdk->logger;
   handle = p_handle;
 
-  Red::GameState init;
+  Red::v1::GameState init{};
   init.OnEnter = [](Red::CGameApplication*) -> bool {
     get()->start();
     return true;
@@ -31,7 +31,7 @@ void HttpPlugin::load(const RED4ext::Sdk* p_sdk,
   init.OnUpdate = nullptr;
   init.OnExit = nullptr;
 
-  Red::GameState shutdown;
+  Red::v1::GameState shutdown{};
   shutdown.OnEnter = [](Red::CGameApplication*) -> bool {
     get()->stop();
     return true;
@@ -111,6 +111,15 @@ std::string HttpPlugin::log_http_method(const HttpMethod p_method) {
     default:
       return "";
   }
+}
+
+void HttpPlugin::log_error(const cpr::Error& p_error) const {
+  if (logger == nullptr || handle == nullptr || !settings.can_log()) {
+    return;
+  }
+  logger->Error(handle, "HTTP error:");
+  logger->Error(handle, std::format("- code: {}", static_cast<int>(p_error.code)).c_str());
+  logger->Error(handle, std::format("- message: {}", p_error.message).c_str());
 }
 
 void HttpPlugin::log_response(const cpr::Response& p_response) const {

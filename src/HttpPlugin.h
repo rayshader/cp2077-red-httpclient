@@ -14,8 +14,8 @@
 namespace RedHttpClient {
 
 class HttpPlugin {
-  Red::PluginHandle handle;
-  Red::Logger* logger;
+  Red::v1::PluginHandle handle;
+  Red::v1::Logger* logger;
 
   cpr::SslOptions ssl_options;
 
@@ -30,7 +30,7 @@ class HttpPlugin {
 
   static HttpPlugin* get();
 
-  void load(const RED4ext::Sdk* p_sdk, Red::PluginHandle p_handle);
+  void load(const RED4ext::v1::Sdk* p_sdk, Red::v1::PluginHandle p_handle);
   void unload();
 
   void start();
@@ -40,6 +40,7 @@ class HttpPlugin {
   [[nodiscard]] bool has_tls() const;
   [[nodiscard]] bool has_self_signed() const;
 
+  void log_error(const cpr::Error& p_error) const;
   void log_response(const cpr::Response& p_response) const;
 
   template <class T>
@@ -61,14 +62,14 @@ class HttpPlugin {
     if constexpr (std::is_same<T, Red::CString>()) {
       body = p_body.c_str();
     } else if constexpr (std::is_same<T, HttpPairs>()) {
-      for (int i = 0; i < p_body.size; i++) {
+      for (int i = 0; i < p_body.Size(); i++) {
         const auto& pair = p_body[i];
 
         body += pair.key.c_str();
-        body += "=";
+        body += '=';
         body += pair.value.c_str();
-        if (i + 1 < p_body.size) {
-          body += "&";
+        if (i + 1 < p_body.Size()) {
+          body += '&';
         }
       }
     } else if constexpr (std::is_same<T, Red::Handle<HttpMultipart>>()) {
@@ -78,10 +79,10 @@ class HttpPlugin {
       for (const auto& part : multipart.parts) {
         body += boundary + "\n";
         body += "Content-Disposition: form-data; name=\"" + part.name + "\"\n";
-        body += "\n";
+        body += '\n';
         body += part.value + "\n";
       }
-      body += "\n";
+      body += '\n';
       body += boundary;
     }
     logger->Info(handle, "");

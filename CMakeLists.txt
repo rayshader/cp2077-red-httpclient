@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.27)
-project(RedHttpClient VERSION 0.7.1)
+project(RedHttpClient VERSION 0.7.2)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
@@ -59,11 +59,16 @@ add_subdirectory(deps/RedLib)
 set_target_properties(RedLib PROPERTIES FOLDER "Dependencies")
 ##
 
-## Library cpr
+## Library cpr 1.14.2
 include(FetchContent)
+
+set(CPR_ENABLE_SSL ON CACHE BOOL "" FORCE)
+# Disable because we don't use Cookies for now
+set(CPR_CURL_USE_LIBPSL OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(cpr
         GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG da40186618909b1a7363d4e4495aa899c6e0eb75)
+        GIT_TAG 1.14.2
+        GIT_SHALLOW ON)
 FetchContent_MakeAvailable(cpr)
 ##
 
@@ -91,7 +96,7 @@ add_custom_command(
         TARGET RedHttpClient
         POST_BUILD
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMENT "$<$<CONFIG:Debug>:Install scripts with red-cli>" "$<$<CONFIG:Release>:Build archive with red-cli>"
+        COMMENT "$<$<CONFIG:Debug>:Install scripts with red-cli>$<$<CONFIG:Release>:Build archive with red-cli>"
         COMMAND "$<$<CONFIG:Debug>:red-cli;install>" "$<$<CONFIG:Release>:red-cli;pack>"
         COMMAND_EXPAND_LISTS
 )

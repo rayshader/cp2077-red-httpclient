@@ -69,13 +69,12 @@ Red::Handle<HttpResponse> HttpClient::send_body(
   const Red::CString& p_url, const Red::CString& p_body,
   const Red::Optional<HttpHeaders>& p_headers) {
   cpr::Header request_headers = build_headers(p_headers.value);
-
   if (!request_headers.contains("Content-Type")) {
     request_headers["Content-Type"] = "text/plain";
   }
   plugin->log_request(Method, p_url, p_body, request_headers);
-  cpr::Response response;
 
+  cpr::Response response;
   if constexpr (Method == HttpMethod::POST) {
     response = cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
                          cpr::Body{p_body.c_str()}, request_headers);
@@ -88,9 +87,17 @@ Red::Handle<HttpResponse> HttpClient::send_body(
   } else if constexpr (Method == HttpMethod::DELETE_) {
     response = cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
                            cpr::Body{p_body.c_str()}, request_headers);
+  } else {
+    static_assert(false, "Invalid HTTP method");
+    return {};
   }
-  Red::DynArray<HttpHeader> headers = get_headers(response);
 
+  if (response.error.code != cpr::ErrorCode::OK) {
+    plugin->log_error(response.error);
+    return {};
+  }
+
+  Red::DynArray<HttpHeader> headers = get_headers(response);
   plugin->log_response(response);
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
                                        response.text);
@@ -101,15 +108,13 @@ Red::Handle<HttpResponse> HttpClient::send_form(
   const Red::CString& p_url, const HttpPairs& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
   std::vector<cpr::Pair> values;
-
   for (const auto& [key, value] : p_form) {
     values.emplace_back(key.c_str(), value.c_str());
   }
   cpr::Header request_headers = build_headers(p_headers.value);
-
   plugin->log_request(Method, p_url, p_form, request_headers);
-  cpr::Response response;
 
+  cpr::Response response;
   if constexpr (Method == HttpMethod::POST) {
     response =
       cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
@@ -126,9 +131,17 @@ Red::Handle<HttpResponse> HttpClient::send_form(
     response =
       cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
                   cpr::Payload{values.begin(), values.end()}, request_headers);
+  } else {
+    static_assert(false, "Invalid HTTP method");
+    return {};
   }
-  Red::DynArray<HttpHeader> headers = get_headers(response);
 
+  if (response.error.code != cpr::ErrorCode::OK) {
+    plugin->log_error(response.error);
+    return {};
+  }
+
+  Red::DynArray<HttpHeader> headers = get_headers(response);
   plugin->log_response(response);
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
                                        response.text);
@@ -139,10 +152,9 @@ Red::Handle<HttpResponse> HttpClient::send_multipart(
   const Red::CString& p_url, const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
   cpr::Header request_headers = build_headers(p_headers.value);
-
   plugin->log_request(Method, p_url, p_form, request_headers);
-  cpr::Response response;
 
+  cpr::Response response;
   if constexpr (Method == HttpMethod::POST) {
     response = cpr::Post(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
                          p_form->get(), request_headers);
@@ -155,9 +167,17 @@ Red::Handle<HttpResponse> HttpClient::send_multipart(
   } else if constexpr (Method == HttpMethod::DELETE_) {
     response = cpr::Delete(plugin->get_ssl_options(), cpr::Url{p_url.c_str()},
                            p_form->get(), request_headers);
+  } else {
+    static_assert(false, "Invalid HTTP method");
+    return {};
   }
-  Red::DynArray<HttpHeader> headers = get_headers(response);
 
+  if (response.error.code != cpr::ErrorCode::OK) {
+    plugin->log_error(response.error);
+    return {};
+  }
+
+  Red::DynArray<HttpHeader> headers = get_headers(response);
   plugin->log_response(response);
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
                                        response.text);
@@ -168,13 +188,18 @@ Red::Handle<HttpResponse> HttpClient::get(
   if (!is_secure(p_url)) {
     return {};
   }
-  cpr::Header request_headers = build_headers(p_headers.value);
 
+  cpr::Header request_headers = build_headers(p_headers.value);
   plugin->log_request(HttpMethod::GET, p_url, "", request_headers);
+
   cpr::Response response = cpr::Get(plugin->get_ssl_options(),
                                     cpr::Url{p_url.c_str()}, request_headers);
-  HttpHeaders headers = get_headers(response);
+  if (response.error.code != cpr::ErrorCode::OK) {
+    plugin->log_error(response.error);
+    return {};
+  }
 
+  HttpHeaders headers = get_headers(response);
   plugin->log_response(response);
   return Red::MakeHandle<HttpResponse>(response.status_code, headers,
                                        response.text);

@@ -17,7 +17,7 @@ struct HttpCallback {
     if (target.Expired()) {
       return;
     }
-    if (data.size == 0) {
+    if (data.IsEmpty()) {
       Red::CallVirtual(target.Lock(), function, p_response);
     } else {
       Red::CallVirtual(target.Lock(), function, p_response, data);

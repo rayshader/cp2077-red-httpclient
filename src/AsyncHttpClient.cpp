@@ -13,11 +13,16 @@ void AsyncHttpClient::queue_request(
 
   job_queue.Dispatch([p_future, p_callback]() -> void {
     cpr::Response response = p_future.get();
+    if (response.error.code != cpr::ErrorCode::OK) {
+      plugin->log_error(response.error);
+      p_callback({});
+      return;
+    }
 
     plugin->log_response(response);
     HttpHeaders headers = HttpClient::get_headers(response);
-    const auto http_response = Red::MakeHandle<HttpResponse>(response.status_code,
-                                                       headers, response.text);
+    const auto http_response = Red::MakeHandle<HttpResponse>(
+      response.status_code, headers, response.text);
 
     p_callback(http_response);
   });
@@ -84,7 +89,8 @@ void AsyncHttpClient::send_form(const HttpCallback& p_callback,
   for (const auto& [key, value] : p_form) {
     values.emplace_back(key.c_str(), value.c_str());
   }
-  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers =
+    HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);
   std::shared_future<cpr::Response> future;
@@ -118,7 +124,8 @@ void AsyncHttpClient::send_multipart(
   const HttpCallback& p_callback, const Red::CString& p_url,
   const Red::Handle<HttpMultipart>& p_form,
   const Red::Optional<HttpHeaders>& p_headers) {
-  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers =
+    HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(Method, p_url, p_form, request_headers);
   std::shared_future<cpr::Response> future;
@@ -151,7 +158,8 @@ void AsyncHttpClient::get(const HttpCallback& p_callback,
     p_callback({});
     return;
   }
-  const cpr::Header request_headers = HttpClient::build_headers(p_headers.value);
+  const cpr::Header request_headers =
+    HttpClient::build_headers(p_headers.value);
 
   plugin->log_request(HttpMethod::GET, p_url, "", request_headers);
   cpr::AsyncResponse response = cpr::GetAsync(
